@@ -1,16 +1,15 @@
 {
-  "extends": "./paths.json",
   "compilerOptions": {
+    "strict": true,
     "target": "ESNext",
     "module": "ESNext",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "strict": true,
     "jsx": "preserve",
-    "jsxImportSource": "solid-js"
+    "jsxImportSource": "solid-js",
+    "types": ["vite/client", "node"],
+    "noEmit": true,
+    "isolatedModules": true
   }
 }
