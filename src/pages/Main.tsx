@@ -4,7 +4,8 @@ import {
 	ListItem,
 	ListIcon,
 	Heading,
-	Switch,
+	notificationService,
+	Input,
 	SwitchPrimitive,
 	css,
 	Text,
@@ -21,7 +22,7 @@ import { TbHash } from "solid-icons/tb";
 import { $fileTypes, $fileTypesActions } from "../stores/fileTypes";
 import { $media, fetchMedia } from "../stores/media";
 import { FaSolidHashtag } from "solid-icons/fa";
-import { $filter } from "../stores/filter";
+import { $filter, $filterActions } from "../stores/filter";
 import { IoClose } from "solid-icons/io";
 
 const switchRootClass = css({
@@ -85,6 +86,17 @@ export function Main() {
 	const handleUpdateFiles = async () => {
 		await fetchMedia();
 		$schemaChanged.set(false);
+	};
+
+	const handleAddFilterWord = (event: SubmitEvent) => {
+		event.preventDefault();
+		const target = event.currentTarget as HTMLFormElement;
+		const formData = new FormData(target);
+		const word = formData.get("word");
+		if (!word) return;
+
+		$filterActions.add(word.toString());
+		target.reset();
 	};
 
 	return (
@@ -174,9 +186,16 @@ export function Main() {
 			<Box css={{ flex: "1 1 0" }}>
 				<Heading mb={18} display="flex" justifyContent="space-between">
 					<Box>Бан ворды</Box>
-					<Button size="xs" onClick={() => prompt("pizda?")}>
-						Добавить
-					</Button>
+					<Box>
+						<form
+							onSubmit={handleAddFilterWord}
+							style={{ display: "flex", "align-items": "center", gap: "8px" }}>
+							<Input required name="word" placeholder="Write here..." size="xs" />
+							<Button type="submit" colorScheme="accent" size="xs">
+								Добавить
+							</Button>
+						</form>
+					</Box>
 				</Heading>
 
 				<Text my={16} fontSize=".9em" color="$neutral9">
@@ -190,7 +209,7 @@ export function Main() {
 							Список пуст
 						</Text>
 					}>
-					{word => (
+					{(word, index) => (
 						<Box
 							my={12}
 							px={16}
@@ -205,6 +224,7 @@ export function Main() {
 								<IconButton
 									size="xs"
 									icon={<IoClose />}
+									onClick={() => $filterActions.remove(index())}
 									variant="dashed"
 									aria-label="remove"
 									colorScheme="danger"

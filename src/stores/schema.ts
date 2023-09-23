@@ -1,11 +1,12 @@
 import { fourChannelFactory, twoChannelFactory } from "webm-grabber";
 import { atom, map, onSet } from "nanostores";
+import { $fileTypes } from "./fileTypes";
 
 const STORAGE_KEY = "schema-cache";
 
 const vendorsMap = {
-	"2ch": twoChannelFactory(),
-	"4chan": fourChannelFactory(),
+	"2ch": twoChannelFactory,
+	"4chan": fourChannelFactory,
 };
 
 export type Vendors = keyof typeof vendorsMap;
@@ -76,6 +77,11 @@ export const $schemaActions = {
 	},
 
 	getVendor(name: keyof typeof vendorsMap) {
-		return vendorsMap[name];
+		return vendorsMap[name]({
+			requiredFileTypes: $fileTypes
+				.get()
+				.filter(v => v.enabled)
+				.map(v => v.name),
+		});
 	},
 };

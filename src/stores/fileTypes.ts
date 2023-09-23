@@ -1,4 +1,5 @@
 import { map, onSet } from "nanostores";
+import { $schemaChanged } from "./schema";
 
 const STORAGE_KEY = "file-types-cache";
 
@@ -53,5 +54,7 @@ export const $fileTypesActions = {
 				return { ...type, enabled: !type.enabled };
 			}),
 		);
+
+		$schemaChanged.set(true);
 	},
 };
