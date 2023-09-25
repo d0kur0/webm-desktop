@@ -20,14 +20,16 @@ export function Threads() {
 	const media = useStore($media);
 
 	const threads = createMemo(() =>
-		media().threads.filter(thread => thread.subject?.includes(searchQuery())),
+		media().threads.filter(
+			thread => thread.subject?.toLowerCase().includes(searchQuery().toLowerCase()),
+		),
 	);
 
 	return (
-		<Box p={16}>
+		<Box p={16} pt={0}>
 			<Heading mb={24}>Список тредов</Heading>
 
-			<form style={{ display: "flex", gap: "12px" }}>
+			<form onreset={() => setSearchQuery("")} style={{ display: "flex", gap: "12px" }}>
 				<Input
 					size="sm"
 					value={searchQuery()}

@@ -1,24 +1,21 @@
 import { action, atom, map, onMount } from "nanostores";
 import { $schema, $schemaActions } from "./schema";
-import { Files, Thread, VendorMethods } from "webm-grabber";
+import { Files, Thread, Threads, VendorMethods } from "webm-grabber";
 import { $filter } from "./filter";
 
 const STORAGE_KEY = "media-cache";
 const MAX_QUEUE_SIZE = 30;
 const CACHE_LIFETIME_SECONDS = 3600;
 
-type ThreadWithVendor = Thread & { vendorName: string };
-
 type Media = {
 	files: Files;
-	threads: ThreadWithVendor[];
+	threads: Threads;
 	loading: boolean;
 	fromCache: boolean;
 };
 
 type MediaCache = {
 	files: Files;
-	threads: ThreadWithVendor[];
 	updatedAt: string;
 };
 
@@ -36,10 +33,19 @@ const cache: MediaCache =
 	serializedCache !== null ? JSON.parse(serializedCache) : emptyCache;
 const isCacheExpired = getTimestamp() - CACHE_LIFETIME_SECONDS > +cache.updatedAt;
 
+function unpackThreadsFromFiles(files: Files) {
+	return files.reduce((acc, { rootThread }) => {
+		acc.find(v => v.id === rootThread.id) || acc.push(rootThread);
+		return acc;
+	}, [] as Threads);
+}
+
+const initialFiles = isCacheExpired ? [] : cache.files;
+
 export const $media = map<Media>({
 	files: isCacheExpired ? [] : cache.files,
-	threads: isCacheExpired ? [] : cache.threads,
 	loading: isCacheExpired,
+	threads: unpackThreadsFromFiles(initialFiles),
 	fromCache: !isCacheExpired,
 });
 
@@ -53,7 +59,7 @@ export const fetchMedia = action($media, "fetchMedia", async () => {
 		schema.map(async v => {
 			$status.set(`fetchThreads from ${v.vendor}`);
 
-			const threads: (ThreadWithVendor & { vendor: VendorMethods })[] = [];
+			const threads: (Thread & { vendor: VendorMethods })[] = [];
 
 			for (const board of v.boards) {
 				const vendor = $schemaActions.getVendor(v.vendor);
@@ -74,8 +80,17 @@ export const fetchMedia = action($media, "fetchMedia", async () => {
 
 	const threads = threadsMap
 		.flat()
-		.map(t => ({ ...t, subject: t.subject?.replace(/<[^>]*>?/gm, "") }))
-		.filter(thread => !$filter.get().some(v => thread.subject?.includes(v)));
+		.map(t => ({
+			...t,
+			subject: t.subject
+				?.replace(/<[^>]*>?/gm, "")
+				?.replace("&gt;", "")
+				?.replace("&lt;", ""),
+		}))
+		.filter(
+			thread =>
+				!$filter.get().some(v => thread.subject?.toLowerCase().includes(v.toLowerCase())),
+		);
 
 	const sourceThreads = [...threads];
 	const initialThreadsCount = threads.length;
@@ -103,12 +118,12 @@ export const fetchMedia = action($media, "fetchMedia", async () => {
 	$status.set(null);
 
 	const filteredFiles = files.filter(
-		file => !$filter.get().some(v => file.name.includes(v)),
+		file => !$filter.get().some(v => file.name.toLowerCase().includes(v.toLowerCase())),
 	);
 
 	$media.setKey("files", filteredFiles);
+	$media.setKey("threads", unpackThreadsFromFiles(filteredFiles));
 	$media.setKey("loading", false);
-	$media.setKey("threads", sourceThreads);
 
 	localStorage.setItem(
 		STORAGE_KEY,

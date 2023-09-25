@@ -1,8 +1,5 @@
-const { BrowserWindow, ipcMain } = require("electron");
-
-function getMainWindow() {
-	return BrowserWindow.getAllWindows()?.[0];
-}
+const { ipcMain } = require("electron");
+const { getMainWindow } = require("../utils/getMainWindow");
 
 ipcMain.on("window/minimize", () => {
 	getMainWindow().minimize();

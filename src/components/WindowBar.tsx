@@ -1,4 +1,11 @@
-import { Box, Button, ButtonGroup, IconButton, SystemStyleObject, useColorMode } from "@hope-ui/solid";
+import {
+	Box,
+	Button,
+	ButtonGroup,
+	IconButton,
+	SystemStyleObject,
+	useColorMode,
+} from "@hope-ui/solid";
 import { VsChromeMinimize } from "solid-icons/vs";
 import { CgMinimizeAlt } from "solid-icons/cg";
 import { IoClose } from "solid-icons/io";
@@ -6,6 +13,7 @@ import { FiMaximize2, FiSun } from "solid-icons/fi";
 import { createSignal, For } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { FaSolidMoon } from "solid-icons/fa";
+import { RiDevelopmentBugFill } from "solid-icons/ri";
 
 const { ipcRenderer } = require("electron");
 
@@ -43,6 +51,7 @@ export function WindowBar() {
 	const navigate = useNavigate();
 
 	const [isFullscreen, setIsFullscreen] = createSignal(false);
+	const [isDevToolsOpened, setIsDevToolsOpened] = createSignal(false);
 
 	const handleMinimize = () => {
 		ipcRenderer.send("window/minimize");
@@ -63,6 +72,11 @@ export function WindowBar() {
 		setPages(pages => pages.map((page, key) => ({ ...page, active: index === key })));
 		const { href } = pages()[index];
 		href && navigate(href);
+	};
+
+	const openDevTools = () => {
+		setIsDevToolsOpened(v => !v);
+		ipcRenderer.send("debug/openTools");
 	};
 
 	return (
@@ -99,15 +113,24 @@ export function WindowBar() {
 
 				<Box css={{ display: "flex", alignItems: "center" }}>
 					<IconButton
+						colorScheme={isDevToolsOpened() ? "warning" : undefined}
+						css={css}
+						variant="dashed"
+						icon={<RiDevelopmentBugFill />}
+						size="sm"
+						aria-label="open dev tools"
+						onClick={openDevTools}
+					/>
+
+					<IconButton
 						css={css}
 						variant="dashed"
 						icon={colorMode() === "dark" ? <FiSun /> : <FaSolidMoon />}
 						size="sm"
 						mr={24}
 						aria-label="toggle theme"
-						onClick={toggleColorMode}>
-						Toggle {colorMode() === "light" ? "dark" : "light"}
-					</IconButton>
+						onClick={toggleColorMode}
+					/>
 
 					<IconButton
 						css={css}

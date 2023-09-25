@@ -21,6 +21,7 @@
   "dependencies": {
     "@hope-ui/solid": "^0.6.7",
     "@nanostores/solid": "^0.4.2",
+    "@solid-primitives/scheduled": "^1.4.1",
     "@solidjs/router": "^0.8.3",
     "@stitches/core": "^1.2.8",
     "electron-squirrel-startup": "^1.0.0",
@@ -29,7 +30,7 @@
     "solid-icons": "^1.0.12",
     "solid-js": "^1.7.6",
     "solid-transition-group": "^0.0.10",
-    "webm-grabber": "^1.1.0"
+    "webm-grabber": "^1.1.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.4.2",

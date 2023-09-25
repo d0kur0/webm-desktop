@@ -100,7 +100,7 @@ export function Main() {
 	};
 
 	return (
-		<Box p={16} css={{ display: "flex", gap: "32px" }}>
+		<Box p={16} pt={0} css={{ display: "flex", gap: "32px" }}>
 			<Box css={{ flex: "1 1 0" }}>
 				<Heading>Используемые борды</Heading>
 
@@ -205,7 +205,12 @@ export function Main() {
 				<For
 					each={filter()}
 					fallback={
-						<Text textAlign="center" p={15} border="1px dashed" color="$neutral9" borderColor="$neutral7">
+						<Text
+							textAlign="center"
+							p={15}
+							border="1px dashed"
+							color="$neutral9"
+							borderColor="$neutral7">
 							Список пуст
 						</Text>
 					}>
