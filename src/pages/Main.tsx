@@ -18,22 +18,22 @@ import { BsSignIntersectionSideFill } from "solid-icons/bs";
 import { useStore } from "@nanostores/solid";
 import { $schema, $schemaActions, $schemaChanged } from "../stores/schema";
 import { For } from "solid-js";
-import { TbHash } from "solid-icons/tb";
 import { $fileTypes, $fileTypesActions } from "../stores/fileTypes";
 import { $media, fetchMedia } from "../stores/media";
 import { FaSolidHashtag } from "solid-icons/fa";
 import { $filter, $filterActions } from "../stores/filter";
 import { IoClose } from "solid-icons/io";
+import { EmptyMessage } from "../components/EmptyMessage";
 
 const switchRootClass = css({
-	display: "inline-flex",
-	alignItems: "center",
-	border: "1px solid $neutral7",
-	rounded: "$sm",
+	w: "$full",
 	px: "$5",
 	py: "$3",
-	w: "$full",
+	border: "1px solid $neutral7",
 	cursor: "pointer",
+	display: "inline-flex",
+	rounded: "$sm",
+	alignItems: "center",
 	userSelect: "none",
 	transition: "box-shadow 250ms",
 
@@ -47,11 +47,11 @@ const switchControlClass = css({
 	all: "unset",
 	width: 34,
 	height: 12,
-	backgroundColor: "$blackAlpha9",
-	borderRadius: "9999px",
 	position: "relative",
 	boxShadow: "0 2px 10px $colors$blackAlpha7",
 	transition: "background-color 250ms",
+	borderRadius: "9999px",
+	backgroundColor: "$blackAlpha9",
 
 	_groupChecked: {
 		backgroundColor: "$info9",
@@ -62,12 +62,12 @@ const switchThumbClass = css({
 	display: "block",
 	width: 20,
 	height: 20,
-	backgroundColor: "white",
-	borderRadius: "9999px",
 	boxShadow: "0 0 2px $colors$blackAlpha7",
-	transition: "transform 250ms",
 	transform: "translate(-4px, -4px)",
+	transition: "transform 250ms",
 	willChange: "transform",
+	borderRadius: "9999px",
+	backgroundColor: "white",
 
 	_checked: {
 		transform: "translate(16px, -4px)",
@@ -100,15 +100,15 @@ export function Main() {
 	};
 
 	return (
-		<Box p={16} pt={0} css={{ display: "flex", gap: "32px" }}>
+		<Box css={{ p: 16, pt: 0, display: "flex", gap: 32 }}>
 			<Box css={{ flex: "1 1 0" }}>
 				<Heading>Используемые борды</Heading>
 
-				<Text my={10} fontSize=".9em" color="$neutral9">
+				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>
 					Борды, с которых собирать файлы
 				</Text>
 
-				<List spacing="$3" mt={12}>
+				<List spacing="$3" css={{ mt: 12 }}>
 					<For each={schema()}>
 						{({ vendor, boards }) => (
 							<>
@@ -120,9 +120,10 @@ export function Main() {
 								{boards.map(board => (
 									<ListItem>
 										<SwitchPrimitive
+											class={switchRootClass()}
 											checked={board.enabled}
 											onChange={() => handleToggleBoard(vendor, board.name)}
-											class={switchRootClass()}>
+										>
 											<VStack w="$full" alignItems="flex-start">
 												<Text size="sm" fontWeight="$semibold">
 													/{board.name}/
@@ -146,17 +147,18 @@ export function Main() {
 					<Button
 						w="$full"
 						my={24}
+						size="sm"
 						onClick={handleUpdateFiles}
 						variant="dashed"
 						colorScheme="warning"
-						size="sm">
+					>
 						Обновить файлы
 					</Button>
 				)}
 
 				<Heading mt={24}>Используемые типы файлов</Heading>
 
-				<Text my={6} fontSize=".9em" color="$neutral9">
+				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>
 					Расширения файлов для поиска
 				</Text>
 
@@ -167,7 +169,8 @@ export function Main() {
 								<SwitchPrimitive
 									checked={type.enabled}
 									onChange={() => handleToggleFileType(type.name)}
-									class={switchRootClass()}>
+									class={switchRootClass()}
+								>
 									<VStack w="$full" alignItems="flex-start">
 										<Text size="sm" fontWeight="$semibold">
 											{type.name}
@@ -188,8 +191,9 @@ export function Main() {
 					<Box>Бан ворды</Box>
 					<Box>
 						<form
+							style={{ display: "flex", "align-items": "center", gap: "8px" }}
 							onSubmit={handleAddFilterWord}
-							style={{ display: "flex", "align-items": "center", gap: "8px" }}>
+						>
 							<Input required name="word" placeholder="Write here..." size="xs" />
 							<Button type="submit" colorScheme="accent" size="xs">
 								Добавить
@@ -202,28 +206,18 @@ export function Main() {
 					Словарь для исключения тредов и файлов, которые их содержат
 				</Text>
 
-				<For
-					each={filter()}
-					fallback={
-						<Text
-							textAlign="center"
-							p={15}
-							border="1px dashed"
-							color="$neutral9"
-							borderColor="$neutral7">
-							Список пуст
-						</Text>
-					}>
+				<For each={filter()} fallback={<EmptyMessage>Список пуст</EmptyMessage>}>
 					{(word, index) => (
 						<Box
 							my={12}
 							px={16}
 							py={8}
-							borderRadius="6px"
 							border="1px dashed"
-							borderColor="$neutral7"
 							display="flex"
-							justifyContent="space-between">
+							borderColor="$neutral7"
+							borderRadius="6px"
+							justifyContent="space-between"
+						>
 							<Box>{word}</Box>
 							<Box>
 								<IconButton

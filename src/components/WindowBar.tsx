@@ -94,7 +94,8 @@ export function WindowBar() {
 					useSelect: "none",
 					alignItems: "center",
 					backgroundColor: "$background",
-				}}>
+				}}
+			>
 				<ButtonGroup variant="outline" spacing="$2" display="flex" alignItems="center">
 					<For each={pages()}>
 						{({ title, active }, index) => (
@@ -102,7 +103,8 @@ export function WindowBar() {
 								variant="outline"
 								onClick={() => handleGotoPage(index())}
 								colorScheme={active ? "info" : undefined}
-								size="xs">
+								size="xs"
+							>
 								{title}
 							</Button>
 						)}

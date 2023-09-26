@@ -23,6 +23,7 @@ function Routing() {
 			<Route path="/" component={Main} />
 			<Route path="/list" component={List} />
 			<Route path="/threads" component={Threads} />
+			<Route path="/thread/:threadId" component={List} />
 			<Route path="/shuffle" component={Shuffle} />
 		</Routes>
 	);
@@ -44,7 +45,7 @@ export function App() {
 					</Match>
 
 					<Match when={!media().loading}>
-						<Box height="calc(100vh - 55px)" overflowY="auto" position="relative">
+						<Box height="calc(100vh - 56px)" overflowY="auto" position="relative">
 							<Routing />
 						</Box>
 					</Match>

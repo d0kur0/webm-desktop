@@ -60,16 +60,19 @@ export function Threads() {
 								borderRadius="8px"
 								color="$neutral9"
 								alignItems="center"
-								justifyContent="center">
+								justifyContent="center"
+							>
 								Список тредов пуст
 							</Box>
-						}>
+						}
+					>
 						{thread => (
 							<ListItem>
 								<Link href={`/thread/${thread.id}`}>
 									<Badge
 										colorScheme={thread.vendorName === "2ch" ? "warning" : "success"}
-										mr={8}>
+										mr={8}
+									>
 										{thread.vendorName}
 									</Badge>
 									{thread.subject?.substring(0, 120) || (
