@@ -93,3 +93,6 @@ out/
 
 # Solidjs out
 dist/
+
+# JB Trash
+.idea
