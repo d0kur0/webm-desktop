@@ -1,17 +1,19 @@
 import { Box, Heading, Anchor } from "@hope-ui/solid";
 import { createMemo, createSignal, For } from "solid-js";
 import { useStore } from "@nanostores/solid";
-import { $media } from "../stores/media";
-import { FilePreview } from "../components/FilePeview";
+import { $filteredFiles, $media } from "../stores/media";
+import { FilePreview } from "../components/FilePreview";
 import { debounce } from "@solid-primitives/scheduled";
 import { EmptyMessage } from "../components/EmptyMessage";
 import { useParams } from "@solidjs/router";
 import { FileViewer } from "../components/FileViewer";
 
-const PAGE_LIMIT = 24;
+const PAGE_LIMIT = 30;
 
 export function List() {
 	const media = useStore($media);
+	const files = useStore($filteredFiles);
+
 	const [page, setPage] = createSignal(1);
 
 	const { threadId } = useParams();
@@ -19,10 +21,10 @@ export function List() {
 
 	const usedFiles = createMemo(() => {
 		if (threadId) {
-			return media().files.filter(({ rootThread }) => rootThread.id === +threadId);
+			return files().filter(({ rootThread }) => rootThread.id === +threadId);
 		}
 
-		return media().files;
+		return files();
 	});
 
 	const filesForRender = createMemo(() => usedFiles().slice(0, page() * PAGE_LIMIT));
@@ -38,10 +40,10 @@ export function List() {
 
 	return (
 		<Box
-			css={{ p: 16, pt: 0, overflowY: "auto", height: "calc(100vh - 56px)" }}
+			css={{ p: 16, overflowY: "auto", height: "calc(100vh - 56px)" }}
 			onScroll={handleRootScroll as never}
 		>
-			<FileViewer file={filesForRender()[0]} />
+			<FileViewer closable file={filesForRender()[0]} />
 
 			<Heading mb={12}>{threadId ? thread()?.subject : "Список файлов"}</Heading>
 
@@ -57,10 +59,12 @@ export function List() {
 			)}
 
 			<Box
-				gap="25px"
-				display="grid"
-				gridAutoRows="210px"
-				gridTemplateColumns="repeat(5, 1fr)"
+				css={{
+					gap: 25,
+					display: "grid",
+					gridAutoRows: "210px",
+					gridTemplateColumns: "repeat(5, 1fr)",
+				}}
 			>
 				<For fallback={<EmptyMessage>Список пуст</EmptyMessage>} each={filesForRender()}>
 					{file => <FilePreview file={file} />}

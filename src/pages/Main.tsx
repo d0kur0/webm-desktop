@@ -100,7 +100,7 @@ export function Main() {
 	};
 
 	return (
-		<Box css={{ p: 16, pt: 0, display: "flex", gap: 32 }}>
+		<Box css={{ p: 16, display: "flex", gap: 32 }}>
 			<Box css={{ flex: "1 1 0" }}>
 				<Heading>Используемые борды</Heading>
 

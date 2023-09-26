@@ -1,7 +1,19 @@
-import { action, atom, map, onMount } from "nanostores";
+import { action, atom, computed, map, onMount } from "nanostores";
 import { $schema, $schemaActions } from "./schema";
-import { Files, Thread, Threads, VendorMethods } from "webm-grabber";
+import { File, Files, Thread, Threads, VendorMethods } from "webm-grabber";
 import { $filter } from "./filter";
+
+export const IMAGE_TYPES = ["png", "jpg", "webp", "gif", "jpeg"];
+
+export function isFileImage(file: File) {
+	const fileExtension = file.url.split("/").pop() || "";
+	return IMAGE_TYPES.includes(fileExtension);
+}
+
+export function getVendorName(file: File): "2ch" | "4chan" {
+	const is2ch = file.rootThread.url.includes("2ch");
+	return is2ch ? "2ch" : "4chan";
+}
 
 const STORAGE_KEY = "media-cache";
 const MAX_QUEUE_SIZE = 30;
@@ -137,4 +149,13 @@ export const fetchMedia = action($media, "fetchMedia", async () => {
 
 onMount($media, () => {
 	$media.get().fromCache || fetchMedia().catch(console.error);
+});
+
+export const $filteredFiles = computed([$media, $filter], (media, filter) => {
+	return media.files.filter(
+		file =>
+			![file.name, file.rootThread.subject || ""].some(v =>
+				filter.some(w => v?.toLowerCase().includes(w?.toLowerCase())),
+			),
+	);
 });

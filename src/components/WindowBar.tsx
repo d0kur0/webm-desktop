@@ -94,6 +94,7 @@ export function WindowBar() {
 					useSelect: "none",
 					alignItems: "center",
 					backgroundColor: "$background",
+					borderBottom: "1px solid $neutral6",
 				}}
 			>
 				<ButtonGroup variant="outline" spacing="$2" display="flex" alignItems="center">
@@ -115,23 +116,23 @@ export function WindowBar() {
 
 				<Box css={{ display: "flex", alignItems: "center" }}>
 					<IconButton
-						colorScheme={isDevToolsOpened() ? "warning" : undefined}
 						css={css}
-						variant="dashed"
 						icon={<RiDevelopmentBugFill />}
 						size="sm"
-						aria-label="open dev tools"
+						variant="dashed"
 						onClick={openDevTools}
+						aria-label="open dev tools"
+						colorScheme={isDevToolsOpened() ? "warning" : undefined}
 					/>
 
 					<IconButton
+						mr={24}
 						css={css}
-						variant="dashed"
 						icon={colorMode() === "dark" ? <FiSun /> : <FaSolidMoon />}
 						size="sm"
-						mr={24}
-						aria-label="toggle theme"
+						variant="dashed"
 						onClick={toggleColorMode}
+						aria-label="toggle theme"
 					/>
 
 					<IconButton

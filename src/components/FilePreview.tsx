@@ -1,6 +1,7 @@
 import { File } from "webm-grabber";
 import { Badge, Box, css, Spinner } from "@hope-ui/solid";
 import { createMemo, createSignal } from "solid-js";
+import { getVendorName, IMAGE_TYPES, isFileImage } from "../stores/media";
 
 type FilePreviewProps = {
 	file: File;
@@ -20,21 +21,17 @@ const overlayStyles = css({
 	backgroundColor: "$neutral2",
 });
 
-const badgeStyles = css({
+const badgeStyles = {
 	fontSize: "0.5rem",
-});
-
-const IMAGE_TYPES = ["png", "jpg", "webp", "gif", "jpeg"];
+};
 
 function stringLengthLimiter(string: string, maxLength = 36) {
 	return `${string.substring(0, maxLength)}${string.length > maxLength ? "..." : ""}`;
 }
 
 export function FilePreview(props: FilePreviewProps) {
-	const fileExtension = createMemo(() => props.file.url.split("/").pop() || "");
-
-	const is2ch = props.file.rootThread.url.includes("2ch");
-	const isImage = IMAGE_TYPES.includes(fileExtension());
+	const isImage = isFileImage(props.file);
+	const vendorNameOfFile = getVendorName(props.file);
 
 	const [isLoading, setIsLoading] = createSignal(true);
 	const [isLoadingFailed, setIsLoadingFailed] = createSignal(false);
@@ -72,21 +69,24 @@ export function FilePreview(props: FilePreviewProps) {
 			{isLoading() || (
 				<>
 					<Box css={{ position: "absolute", top: 5, left: 5, display: "flex", gap: 8 }}>
-						<Badge colorScheme={isImage ? "neutral" : "primary"} class={badgeStyles()}>
+						<Badge colorScheme={isImage ? "neutral" : "primary"} css={badgeStyles}>
 							{isImage ? "Image" : "Video"}
 						</Badge>
 
-						<Badge colorScheme={is2ch ? "warning" : "success"} class={badgeStyles()}>
-							{is2ch ? "2ch" : "4chan"}
+						<Badge
+							colorScheme={vendorNameOfFile ? "warning" : "success"}
+							css={badgeStyles}
+						>
+							{vendorNameOfFile}
 						</Badge>
 
-						<Badge colorScheme="accent" class={badgeStyles()}>
+						<Badge colorScheme="accent" css={badgeStyles}>
 							{props.file.name}
 						</Badge>
 					</Box>
 
-					<Box css={{ position: "absolute", bottom: 0, left: 5 }}>
-						<Badge colorScheme="info" class={badgeStyles()}>
+					<Box css={{ position: "absolute", bottom: 5, left: 5 }}>
+						<Badge colorScheme="info" css={badgeStyles}>
 							{stringLengthLimiter(props.file.rootThread.subject || "")}
 						</Badge>
 					</Box>

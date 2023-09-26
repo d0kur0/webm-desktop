@@ -26,7 +26,7 @@ export function Threads() {
 	);
 
 	return (
-		<Box p={16} pt={0}>
+		<Box p={16}>
 			<Heading mb={24}>Список тредов</Heading>
 
 			<form onreset={() => setSearchQuery("")} style={{ display: "flex", gap: "12px" }}>
@@ -66,23 +66,24 @@ export function Threads() {
 							</Box>
 						}
 					>
-						{thread => (
-							<ListItem>
-								<Link href={`/thread/${thread.id}`}>
-									<Badge
-										colorScheme={thread.vendorName === "2ch" ? "warning" : "success"}
-										mr={8}
-									>
-										{thread.vendorName}
-									</Badge>
-									{thread.subject?.substring(0, 120) || (
-										<Text as="span" color="$neutral9">
-											Тред без названия
-										</Text>
-									)}
-								</Link>
-							</ListItem>
-						)}
+						{thread => {
+							const is2ch = thread.url.includes("2ch");
+
+							return (
+								<ListItem>
+									<Link href={`/thread/${thread.id}`}>
+										<Badge colorScheme={is2ch ? "warning" : "success"} mr={8}>
+											{is2ch ? "2ch" : "4chan"}
+										</Badge>
+										{thread.subject?.substring(0, 120) || (
+											<Text as="span" color="$neutral9">
+												Тред без названия
+											</Text>
+										)}
+									</Link>
+								</ListItem>
+							);
+						}}
 					</For>
 				</List>
 			</Box>

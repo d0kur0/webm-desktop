@@ -36,7 +36,7 @@ export function App() {
 
 	return (
 		<HopeProvider config={{ initialColorMode: "system" }}>
-			<NotificationsProvider>
+			<NotificationsProvider placement="bottom">
 				<WindowBar />
 
 				<Switch>
@@ -45,7 +45,7 @@ export function App() {
 					</Match>
 
 					<Match when={!media().loading}>
-						<Box height="calc(100vh - 56px)" overflowY="auto" position="relative">
+						<Box height="calc(100vh - 52px)" overflowY="auto" position="relative">
 							<Routing />
 						</Box>
 					</Match>
