@@ -6,7 +6,7 @@ import { $filter } from "./filter";
 export const IMAGE_TYPES = ["png", "jpg", "webp", "gif", "jpeg"];
 
 export function isFileImage(file: File) {
-	const fileExtension = file.url.split("/").pop() || "";
+	const fileExtension = file.url.split("/").pop()?.split(".").pop() || "";
 	return IMAGE_TYPES.includes(fileExtension);
 }
 
@@ -74,6 +74,8 @@ export const fetchMedia = action($media, "fetchMedia", async () => {
 			const threads: (Thread & { vendor: VendorMethods })[] = [];
 
 			for (const board of v.boards) {
+				if (!board.enabled) continue;
+
 				const vendor = $schemaActions.getVendor(v.vendor);
 				threads.push(
 					...(await vendor.fetchThreads(board.name)).map(q => ({

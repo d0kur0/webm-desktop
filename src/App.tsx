@@ -9,6 +9,7 @@ import { WindowBar } from "./components/WindowBar";
 import { Threads } from "./pages/Threads";
 import { List } from "./pages/List";
 import { Shuffle } from "./pages/Shuffle";
+import "./App.css";
 
 const globalStyles = globalCss({
 	"*": {

@@ -101,52 +101,17 @@ export function Main() {
 
 	return (
 		<Box css={{ p: 16, display: "flex", gap: 32 }}>
-			<Box css={{ flex: "1 1 0" }}>
+			<Box css={{ flex: "2 1 0" }}>
 				<Heading>Используемые борды</Heading>
 
 				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>
 					Борды, с которых собирать файлы
 				</Text>
 
-				<List spacing="$3" css={{ mt: 12 }}>
-					<For each={schema()}>
-						{({ vendor, boards }) => (
-							<>
-								<ListItem css={{ fontWeight: "bolder" }}>
-									<ListIcon as={BsSignIntersectionSideFill} color="$info9" />
-									{vendor}
-								</ListItem>
-
-								{boards.map(board => (
-									<ListItem>
-										<SwitchPrimitive
-											class={switchRootClass()}
-											checked={board.enabled}
-											onChange={() => handleToggleBoard(vendor, board.name)}
-										>
-											<VStack w="$full" alignItems="flex-start">
-												<Text size="sm" fontWeight="$semibold">
-													/{board.name}/
-												</Text>
-												<Text size="xs" color="$neutral11">
-													{board.description}
-												</Text>
-											</VStack>
-											<Box class={switchControlClass()}>
-												<SwitchPrimitiveThumb class={switchThumbClass()} />
-											</Box>
-										</SwitchPrimitive>
-									</ListItem>
-								))}
-							</>
-						)}
-					</For>
-				</List>
-
 				{schemaChanged() && (
 					<Button
 						w="$full"
-						my={24}
+						my={8}
 						size="sm"
 						onClick={handleUpdateFiles}
 						variant="dashed"
@@ -156,34 +121,42 @@ export function Main() {
 					</Button>
 				)}
 
-				<Heading mt={24}>Используемые типы файлов</Heading>
+				<Box css={{ display: "flex", gap: 30, mt: 8 }}>
+					<For each={schema()}>
+						{({ vendor, boards }) => (
+							<Box css={{ flex: "1 1 0" }}>
+								<Box css={{ fontWeight: "bolder" }}>
+									<ListIcon as={BsSignIntersectionSideFill} color="$info9" />
+									{vendor}
+								</Box>
 
-				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>
-					Расширения файлов для поиска
-				</Text>
-
-				<List spacing="$3" mt={12}>
-					<For each={fileTypes()}>
-						{type => (
-							<ListItem>
-								<SwitchPrimitive
-									checked={type.enabled}
-									onChange={() => handleToggleFileType(type.name)}
-									class={switchRootClass()}
-								>
-									<VStack w="$full" alignItems="flex-start">
-										<Text size="sm" fontWeight="$semibold">
-											{type.name}
-										</Text>
-									</VStack>
-									<Box class={switchControlClass()}>
-										<SwitchPrimitiveThumb class={switchThumbClass()} />
-									</Box>
-								</SwitchPrimitive>
-							</ListItem>
+								<List spacing="$3" css={{ mt: 12 }}>
+									{boards.map(board => (
+										<ListItem>
+											<SwitchPrimitive
+												class={switchRootClass()}
+												checked={board.enabled}
+												onChange={() => handleToggleBoard(vendor, board.name)}
+											>
+												<VStack w="$full" alignItems="flex-start">
+													<Text size="sm" fontWeight="$semibold">
+														/{board.name}/
+													</Text>
+													<Text size="xs" color="$neutral11">
+														{board.description}
+													</Text>
+												</VStack>
+												<Box class={switchControlClass()}>
+													<SwitchPrimitiveThumb class={switchThumbClass()} />
+												</Box>
+											</SwitchPrimitive>
+										</ListItem>
+									))}
+								</List>
+							</Box>
 						)}
 					</For>
-				</List>
+				</Box>
 			</Box>
 
 			<Box css={{ flex: "1 1 0" }}>
@@ -202,7 +175,7 @@ export function Main() {
 					</Box>
 				</Heading>
 
-				<Text my={16} fontSize=".9em" color="$neutral9">
+				<Text my={8} fontSize=".9em" color="$neutral9">
 					Словарь для исключения тредов и файлов, которые их содержат
 				</Text>
 
@@ -232,9 +205,7 @@ export function Main() {
 						</Box>
 					)}
 				</For>
-			</Box>
 
-			<Box css={{ flex: "1 1 0" }}>
 				<Heading>Сводка</Heading>
 
 				<List spacing="$3" mt={16}>
@@ -246,6 +217,35 @@ export function Main() {
 						<ListIcon as={FaSolidHashtag} color="$success9" />
 						Найдено файлов: {media().files.length}
 					</ListItem>
+				</List>
+
+				<Heading mt={24}>Используемые типы файлов</Heading>
+
+				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>
+					Расширения файлов для поиска
+				</Text>
+
+				<List spacing="$3" mt={12}>
+					<For each={fileTypes()}>
+						{type => (
+							<ListItem>
+								<SwitchPrimitive
+									checked={type.enabled}
+									onChange={() => handleToggleFileType(type.name)}
+									class={switchRootClass()}
+								>
+									<VStack w="$full" alignItems="flex-start">
+										<Text size="sm" fontWeight="$semibold">
+											{type.name}
+										</Text>
+									</VStack>
+									<Box class={switchControlClass()}>
+										<SwitchPrimitiveThumb class={switchThumbClass()} />
+									</Box>
+								</SwitchPrimitive>
+							</ListItem>
+						)}
+					</For>
 				</List>
 			</Box>
 		</Box>

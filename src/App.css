@@ -1,0 +1,20 @@
+video::-webkit-media-controls-panel {
+	display: flex !important;
+	opacity: 1 !important;
+}
+
+::-webkit-scrollbar {
+	height: 8px;
+	width: 8px;
+	background: var(--hope-colors-neutral1);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--hope-colors-accent9);
+	-webkit-border-radius: 1ex;
+	-webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+::-webkit-scrollbar-corner {
+	background: #000;
+}
