@@ -1,35 +1,23 @@
-import {
-	Box,
-	Input,
-	Button,
-	Heading,
-	List,
-	ListIcon,
-	ListItem,
-	Text,
-	Badge,
-} from "@hope-ui/solid";
+import { Box, Input, Button, Heading, List, ListItem, Text, Badge } from "@hope-ui/solid";
 import { createMemo, createSignal, For } from "solid-js";
 import { useStore } from "@nanostores/solid";
-import { $media } from "../stores/media";
+import { $threads } from "../stores/media";
 import { Link } from "@solidjs/router";
 
-export function Threads() {
+export function PageThreads() {
 	const [searchQuery, setSearchQuery] = createSignal("");
 
-	const media = useStore($media);
+	const threads = useStore($threads);
 
-	const threads = createMemo(() =>
-		media().threads.filter(
-			thread => thread.subject?.toLowerCase().includes(searchQuery().toLowerCase()),
-		),
+	const filteredThreads = createMemo(() =>
+		threads().filter(thread => thread.subject?.toLowerCase().includes(searchQuery().toLowerCase())),
 	);
 
 	return (
 		<Box p={16}>
 			<Heading mb={24}>Список тредов</Heading>
 
-			<form onreset={() => setSearchQuery("")} style={{ display: "flex", gap: "12px" }}>
+			<form onReset={() => setSearchQuery("")} style={{ display: "flex", gap: "12px" }}>
 				<Input
 					size="sm"
 					value={searchQuery()}
@@ -43,15 +31,15 @@ export function Threads() {
 			</form>
 
 			<Box mt={24}>
-				{!!threads().length && (
+				{!!filteredThreads().length && (
 					<Text color="$neutral9" fontSize="0.8em" mb={8}>
-						Тредов: {threads().length}
+						Тредов: {filteredThreads().length}
 					</Text>
 				)}
 
 				<List spacing="$3">
 					<For
-						each={threads()}
+						each={filteredThreads()}
 						fallback={
 							<Box
 								p={12}

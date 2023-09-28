@@ -10,7 +10,7 @@
     "start-vite": "vite",
     "package": "cross-env NODE_ENV=production vite build && electron-forge package",
     "make": "cross-env NODE_ENV=production vite build && electron-forge make",
-    "lint": "echo \"No linting configured\""
+    "lint": "eslint ./src --ext .ts,.js,.tsx"
   },
   "keywords": [],
   "author": {
@@ -41,9 +41,14 @@
     "@electron-forge/plugin-auto-unpack-natives": "^6.4.2",
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "@types/node": "^20.6.3",
+    "@typescript-eslint/eslint-plugin": "^6.7.3",
+    "@typescript-eslint/parser": "^6.7.3",
     "concurrently": "^8.2.1",
     "cross-env": "^7.0.3",
     "electron": "26.2.2",
+    "eslint": "^8.50.0",
+    "eslint-plugin-solid": "^0.13.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
     "prettier": "^3.0.3",
     "solid-devtools": "^0.27.3",
     "typescript": "^5.1.3",

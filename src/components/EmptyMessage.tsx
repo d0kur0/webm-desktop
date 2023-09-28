@@ -5,7 +5,7 @@ type EmptyMessageProps = {
 	children: JSXElement;
 };
 
-export function EmptyMessage({ children }: EmptyMessageProps) {
+export function EmptyMessage(props: EmptyMessageProps) {
 	return (
 		<Box
 			p={12}
@@ -14,8 +14,9 @@ export function EmptyMessage({ children }: EmptyMessageProps) {
 			borderRadius="8px"
 			color="$neutral9"
 			alignItems="center"
-			justifyContent="center">
-			{children}
+			justifyContent="center"
+		>
+			{props.children}
 		</Box>
 	);
 }

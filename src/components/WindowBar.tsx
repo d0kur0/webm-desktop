@@ -1,11 +1,4 @@
-import {
-	Box,
-	Button,
-	ButtonGroup,
-	IconButton,
-	SystemStyleObject,
-	useColorMode,
-} from "@hope-ui/solid";
+import { Box, Button, ButtonGroup, IconButton, SystemStyleObject, useColorMode } from "@hope-ui/solid";
 import { VsChromeMinimize } from "solid-icons/vs";
 import { CgMinimizeAlt } from "solid-icons/cg";
 import { IoClose } from "solid-icons/io";
@@ -15,7 +8,7 @@ import { useNavigate } from "@solidjs/router";
 import { FaSolidMoon } from "solid-icons/fa";
 import { RiDevelopmentBugFill } from "solid-icons/ri";
 
-const { ipcRenderer } = require("electron");
+const { ipcRenderer } = window.require("electron");
 
 const css: SystemStyleObject = {
 	scale: "0.8",
@@ -83,11 +76,11 @@ export function WindowBar() {
 		<>
 			<Box
 				css={{
-					top: "0",
-					lefT: "0",
+					top: 0,
+					lefT: 0,
 					width: "100%",
 					zIndex: "200",
-					height: "52px",
+					height: "var(--window-header-height)",
 					display: "flex",
 					padding: "0 15px",
 					position: "fixed",
@@ -164,7 +157,7 @@ export function WindowBar() {
 				</Box>
 			</Box>
 
-			<Box css={{ height: "52px" }}></Box>
+			<Box css={{ height: "var(--window-header-height)" }} />
 		</>
 	);
 }

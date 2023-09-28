@@ -31,7 +31,7 @@ function stringLengthLimiter(string: string, maxLength = 36) {
 
 export function FilePreview(props: FilePreviewProps) {
 	const isImage = createMemo(() => isFileImage(props.file));
-	const vendorNameOfFile = getVendorName(props.file);
+	const vendorNameOfFile = createMemo(() => getVendorName(props.file));
 
 	const theme = useTheme();
 
@@ -56,9 +56,9 @@ export function FilePreview(props: FilePreviewProps) {
 		>
 			<img
 				alt="preview image"
-				src={isImage() ? props.file.url : props.file.previewUrl}
+				src={props.file.previewUrl}
 				onLoad={() => setIsLoading(false)}
-				onerror={() => setIsLoadingFailed(true)}
+				onError={() => setIsLoadingFailed(true)}
 				style={{
 					width: "100%",
 					height: "100%",
@@ -81,11 +81,8 @@ export function FilePreview(props: FilePreviewProps) {
 							{isImage() ? "Image" : "Video"}
 						</Badge>
 
-						<Badge
-							colorScheme={vendorNameOfFile ? "warning" : "success"}
-							css={badgeStyles}
-						>
-							{vendorNameOfFile}
+						<Badge colorScheme={vendorNameOfFile() ? "warning" : "success"} css={badgeStyles}>
+							{vendorNameOfFile()}
 						</Badge>
 
 						<Badge colorScheme="accent" css={badgeStyles}>

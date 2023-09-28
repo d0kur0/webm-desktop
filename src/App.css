@@ -1,6 +1,21 @@
-video::-webkit-media-controls-panel {
-	display: flex !important;
-	opacity: 1 !important;
+body {
+	font-family:
+		"Circe Rounded",
+		-apple-system,
+		BlinkMacSystemFont,
+		"Segoe UI",
+		"Roboto",
+		"Oxygen",
+		"Ubuntu",
+		"Cantarell",
+		"Fira Sans",
+		"Droid Sans",
+		"Helvetica Neue",
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	--window-header-height: 52px;
 }
 
 ::-webkit-scrollbar {

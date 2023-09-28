@@ -1,5 +1,5 @@
 import { Box } from "@hope-ui/solid";
 
-export function Shuffle() {
+export function PageShuffleFile() {
 	return <Box p={16}>wip</Box>;
 }

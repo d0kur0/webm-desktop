@@ -1,17 +1,10 @@
-import {
-	Box,
-	Button,
-	ButtonGroup,
-	ButtonProps,
-	IconButton,
-	notificationService,
-} from "@hope-ui/solid";
+import { Box, Button, ButtonGroup, ButtonProps, IconButton, notificationService } from "@hope-ui/solid";
 import { useNavigate } from "@solidjs/router";
 import { IoClose } from "solid-icons/io";
 import { File } from "webm-grabber";
 import { $filterActions } from "../stores/filter";
 import { isFileImage } from "../stores/media";
-import { JSXElement, createMemo, onMount } from "solid-js";
+import { createMemo, onMount } from "solid-js";
 import { TbPlayerTrackNextFilled, TbPlayerTrackPrevFilled } from "solid-icons/tb";
 
 type FileViewerProps = {
@@ -20,12 +13,12 @@ type FileViewerProps = {
 	closable?: boolean;
 };
 
-export function FileViewer({ file, closable, ...props }: FileViewerProps) {
-	const isImage = createMemo(() => isFileImage(file));
+export function FileViewer(props: FileViewerProps) {
+	const isImage = createMemo(() => isFileImage(props.file));
 	const navigate = useNavigate();
 
 	const handleHideThread = () => {
-		file.rootThread.subject && $filterActions.add(file.rootThread.subject);
+		props.file.rootThread.subject && $filterActions.add(props.file.rootThread.subject);
 
 		notificationService.show({
 			title: "Сабж треда добавлен в бан ворды, все файлы скрыты",
@@ -36,13 +29,12 @@ export function FileViewer({ file, closable, ...props }: FileViewerProps) {
 	};
 
 	const navigateToThread = () => {
-		navigate(`/thread/${file.rootThread.id}`);
+		navigate(`/thread/${props.file.rootThread.id}`);
 	};
 
 	return (
 		<Box
 			css={{
-				px: 16,
 				top: 0,
 				left: 0,
 				width: "100%",
@@ -54,6 +46,7 @@ export function FileViewer({ file, closable, ...props }: FileViewerProps) {
 		>
 			<Box
 				css={{
+					p: 16,
 					height: 52,
 					display: "flex",
 					alignItems: "center",
@@ -61,14 +54,14 @@ export function FileViewer({ file, closable, ...props }: FileViewerProps) {
 				}}
 			>
 				<Box css={{ color: "$neutral9", display: "flex" }}>
-					<Box>{file.name || "Файл без имени"}</Box>
+					<Box>{props.file.name || "Файл без имени"}</Box>
 
 					<ButtonGroup size="xs" colorScheme="info" variant="dashed" ml={16}>
 						<Button onClick={navigateToThread}>Открыть тред</Button>
 						<Button onClick={handleHideThread}>Добавить тред в бан ворды</Button>
 					</ButtonGroup>
 				</Box>
-				{closable && (
+				{props.closable && (
 					<Box>
 						<IconButton
 							size="xs"
@@ -82,9 +75,7 @@ export function FileViewer({ file, closable, ...props }: FileViewerProps) {
 				)}
 			</Box>
 
-			<Box
-				css={{ height: "calc(100vh - 106px)", display: "flex", flexDirection: "column" }}
-			>
+			<Box css={{ height: "calc(100vh - 106px)", display: "flex", flexDirection: "column" }}>
 				<Box
 					css={{
 						height: "100%",
@@ -102,8 +93,8 @@ export function FileViewer({ file, closable, ...props }: FileViewerProps) {
 							justifyContent: "center",
 						}}
 					>
-						{isImage() && <ImagePlayer file={file} />}
-						{isImage() || <VideoPlayer file={file} />}
+						{isImage() && <ImagePlayer file={props.file} />}
+						{isImage() || <VideoPlayer file={props.file} />}
 					</Box>
 				</Box>
 			</Box>
@@ -117,7 +108,7 @@ type PlayerProps = {
 	onPrev?(): void;
 };
 
-function ImagePlayer({ file, ...props }: PlayerProps) {
+function ImagePlayer(props: PlayerProps) {
 	return (
 		<Box
 			css={{
@@ -133,8 +124,8 @@ function ImagePlayer({ file, ...props }: PlayerProps) {
 					height: "calc(100vh - 104px)",
 				}}
 				as="img"
-				src={file.url}
-				alt={file.name}
+				src={props.file.url}
+				alt={props.file.name}
 			/>
 
 			<Box
@@ -158,7 +149,7 @@ function ImagePlayer({ file, ...props }: PlayerProps) {
 	);
 }
 
-function VideoPlayer({ file, ...props }: PlayerProps) {
+function VideoPlayer(props: PlayerProps) {
 	let videoRef: HTMLVideoElement;
 
 	const handleVolumeChange = () => {
@@ -183,8 +174,8 @@ function VideoPlayer({ file, ...props }: PlayerProps) {
 					width: "100%",
 					height: "calc(100vh - 104px)",
 				}}
-				src={file.url}
-				poster={file.previewUrl}
+				src={props.file.url}
+				poster={props.file.previewUrl}
 				autoplay
 				controls
 				onTimeUpdate={handleTimeUpdate}
@@ -212,7 +203,7 @@ function VideoPlayer({ file, ...props }: PlayerProps) {
 	);
 }
 
-function CustomPlayerButton({ children, ...props }: ButtonProps) {
+function CustomPlayerButton(props: ButtonProps) {
 	return (
 		<Box
 			{...props}
@@ -237,8 +228,6 @@ function CustomPlayerButton({ children, ...props }: ButtonProps) {
 					backgroundColor: "#1A1B1E",
 				},
 			}}
-		>
-			{children}
-		</Box>
+		/>
 	);
 }

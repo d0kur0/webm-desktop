@@ -4,7 +4,6 @@ import {
 	ListItem,
 	ListIcon,
 	Heading,
-	notificationService,
 	Input,
 	SwitchPrimitive,
 	css,
@@ -19,7 +18,7 @@ import { useStore } from "@nanostores/solid";
 import { $schema, $schemaActions, $schemaChanged } from "../stores/schema";
 import { For } from "solid-js";
 import { $fileTypes, $fileTypesActions } from "../stores/fileTypes";
-import { $media, fetchMedia } from "../stores/media";
+import { $media, $threads, fetchMedia } from "../stores/media";
 import { FaSolidHashtag } from "solid-icons/fa";
 import { $filter, $filterActions } from "../stores/filter";
 import { IoClose } from "solid-icons/io";
@@ -74,12 +73,12 @@ const switchThumbClass = css({
 	},
 });
 
-export function Main() {
+export function PageDashBoard() {
 	const media = useStore($media);
+	const threads = useStore($threads);
 	const schema = useStore($schema);
 	const filter = useStore($filter);
 	const fileTypes = useStore($fileTypes);
-	const schemaChanged = useStore($schemaChanged);
 
 	const handleToggleBoard = $schemaActions.toggleBoardEnabled;
 	const handleToggleFileType = $fileTypesActions.toggle;
@@ -104,22 +103,11 @@ export function Main() {
 			<Box css={{ flex: "2 1 0" }}>
 				<Heading>Используемые борды</Heading>
 
-				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>
-					Борды, с которых собирать файлы
-				</Text>
+				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>Борды, с которых собирать файлы</Text>
 
-				{schemaChanged() && (
-					<Button
-						w="$full"
-						my={8}
-						size="sm"
-						onClick={handleUpdateFiles}
-						variant="dashed"
-						colorScheme="warning"
-					>
-						Обновить файлы
-					</Button>
-				)}
+				<Button w="$full" my={8} size="sm" onClick={handleUpdateFiles} variant="dashed" colorScheme="warning">
+					Обновить файлы
+				</Button>
 
 				<Box css={{ display: "flex", gap: 30, mt: 8 }}>
 					<For each={schema()}>
@@ -131,27 +119,29 @@ export function Main() {
 								</Box>
 
 								<List spacing="$3" css={{ mt: 12 }}>
-									{boards.map(board => (
-										<ListItem>
-											<SwitchPrimitive
-												class={switchRootClass()}
-												checked={board.enabled}
-												onChange={() => handleToggleBoard(vendor, board.name)}
-											>
-												<VStack w="$full" alignItems="flex-start">
-													<Text size="sm" fontWeight="$semibold">
-														/{board.name}/
-													</Text>
-													<Text size="xs" color="$neutral11">
-														{board.description}
-													</Text>
-												</VStack>
-												<Box class={switchControlClass()}>
-													<SwitchPrimitiveThumb class={switchThumbClass()} />
-												</Box>
-											</SwitchPrimitive>
-										</ListItem>
-									))}
+									<For each={boards}>
+										{board => (
+											<ListItem>
+												<SwitchPrimitive
+													class={switchRootClass()}
+													checked={board.enabled}
+													onChange={() => handleToggleBoard(vendor, board.name)}
+												>
+													<VStack w="$full" alignItems="flex-start">
+														<Text size="sm" fontWeight="$semibold">
+															/{board.name}/
+														</Text>
+														<Text size="xs" color="$neutral11">
+															{board.description}
+														</Text>
+													</VStack>
+													<Box class={switchControlClass()}>
+														<SwitchPrimitiveThumb class={switchThumbClass()} />
+													</Box>
+												</SwitchPrimitive>
+											</ListItem>
+										)}
+									</For>
 								</List>
 							</Box>
 						)}
@@ -211,7 +201,7 @@ export function Main() {
 				<List spacing="$3" mt={16}>
 					<ListItem>
 						<ListIcon as={FaSolidHashtag} color="$success9" />
-						Найдено тредов: {media().threads.length}
+						Найдено тредов: {threads().length}
 					</ListItem>
 					<ListItem>
 						<ListIcon as={FaSolidHashtag} color="$success9" />
@@ -221,9 +211,7 @@ export function Main() {
 
 				<Heading mt={24}>Используемые типы файлов</Heading>
 
-				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>
-					Расширения файлов для поиска
-				</Text>
+				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>Расширения файлов для поиска</Text>
 
 				<List spacing="$3" mt={12}>
 					<For each={fileTypes()}>
