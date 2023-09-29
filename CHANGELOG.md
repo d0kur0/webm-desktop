@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/d0kur0/webm-desktop/compare/v1.0.0...v1.0.1) (2023-09-29)
+
+
+### Bug Fixes
+
+* add version update ([be888b8](https://github.com/d0kur0/webm-desktop/commit/be888b897675adaea5db24a748b8f566b3ae8522))
+* testing pipeline and release ([dd881d0](https://github.com/d0kur0/webm-desktop/commit/dd881d061077cb72c3e97a49145e4a292ec498bc))
+
 # 1.0.0 (2023-09-29)
 
 
