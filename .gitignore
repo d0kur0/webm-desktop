@@ -90,6 +90,9 @@ typings/
 
 # Electron-Forge
 out/
+dist-linux/
+dist-windows/
+dist-macos/
 
 # Solidjs out
 dist/
