@@ -1,15 +1,16 @@
 import { Route, Routes } from "@solidjs/router";
 import { NotificationsProvider, HopeProvider, Box } from "@hope-ui/solid";
 import { useStore } from "@nanostores/solid";
-import { $media } from "./stores/media";
+import { $files } from "./stores/media";
 import { ErrorBoundary, Match, Switch } from "solid-js";
-import { GlobalLoading } from "./components/GlobalLoading";
+import { MediaLoading } from "./components/MediaLoading";
 import { PageDashBoard } from "./pages/PageDashBoard";
 import { WindowBar } from "./components/WindowBar";
 import { PageThreads } from "./pages/PageThreads";
 import { PageListFiles } from "./pages/PageListFiles";
 import { PageShuffleFile } from "./pages/PageShuffleFile";
 import "./App.css";
+import { ViewPort } from "./components/ViewPort";
 
 function Routing() {
 	return (
@@ -24,7 +25,7 @@ function Routing() {
 }
 
 export function App() {
-	const media = useStore($media);
+	const media = useStore($files);
 
 	return (
 		<HopeProvider config={{ initialColorMode: "system" }}>
@@ -34,19 +35,13 @@ export function App() {
 				<ErrorBoundary fallback={err => <Box css={{ p: 16 }}>{err.toString()}</Box>}>
 					<Switch>
 						<Match when={media().loading}>
-							<GlobalLoading />
+							<MediaLoading />
 						</Match>
 
 						<Match when={!media().loading}>
-							<Box
-								css={{
-									height: "calc(100vh - var(--window-header-height))",
-									overflowY: "auto",
-									position: "relative",
-								}}
-							>
+							<ViewPort>
 								<Routing />
-							</Box>
+							</ViewPort>
 						</Match>
 					</Switch>
 				</ErrorBoundary>

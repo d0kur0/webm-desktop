@@ -15,14 +15,14 @@ import {
 } from "@hope-ui/solid";
 import { BsSignIntersectionSideFill } from "solid-icons/bs";
 import { useStore } from "@nanostores/solid";
-import { $schema, $schemaActions, $schemaChanged } from "../stores/schema";
+import { $schema, $schemaChanged, $schemaToggleBoardEnabled } from "../stores/schema";
 import { For } from "solid-js";
-import { $fileTypes, $fileTypesActions } from "../stores/fileTypes";
-import { $media, $threads, fetchMedia } from "../stores/media";
+import { $fileTypes, $fileTypesToggleEnabled } from "../stores/fileTypes";
+import { $filesFetch, $filteredFiles, $threads } from "../stores/media";
 import { FaSolidHashtag } from "solid-icons/fa";
-import { $filter, $filterActions } from "../stores/filter";
+import { $exclude, $excludeAddWord, $excludeRemoveWord } from "../stores/exclude";
 import { IoClose } from "solid-icons/io";
-import { EmptyMessage } from "../components/EmptyMessage";
+import { Empty } from "../components/Empty";
 
 const switchRootClass = css({
 	w: "$full",
@@ -74,16 +74,17 @@ const switchThumbClass = css({
 });
 
 export function PageDashBoard() {
-	const media = useStore($media);
-	const threads = useStore($threads);
+	const files = useStore($filteredFiles);
+	const exclude = useStore($exclude);
 	const schema = useStore($schema);
-	const filter = useStore($filter);
+	const threads = useStore($threads);
 	const fileTypes = useStore($fileTypes);
 
-	const handleToggleBoard = $schemaActions.toggleBoardEnabled;
-	const handleToggleFileType = $fileTypesActions.toggle;
+	const handleToggleBoard = $schemaToggleBoardEnabled;
+	const handleToggleFileType = $fileTypesToggleEnabled;
+
 	const handleUpdateFiles = async () => {
-		await fetchMedia();
+		await $filesFetch();
 		$schemaChanged.set(false);
 	};
 
@@ -94,7 +95,7 @@ export function PageDashBoard() {
 		const word = formData.get("word");
 		if (!word) return;
 
-		$filterActions.add(word.toString());
+		$excludeAddWord(word.toString());
 		target.reset();
 	};
 
@@ -169,7 +170,7 @@ export function PageDashBoard() {
 					Словарь для исключения тредов и файлов, которые их содержат
 				</Text>
 
-				<For each={filter()} fallback={<EmptyMessage>Список пуст</EmptyMessage>}>
+				<For each={exclude().words} fallback={<Empty>Список пуст</Empty>}>
 					{(word, index) => (
 						<Box
 							my={12}
@@ -186,7 +187,7 @@ export function PageDashBoard() {
 								<IconButton
 									size="xs"
 									icon={<IoClose />}
-									onClick={() => $filterActions.remove(index())}
+									onClick={() => $excludeRemoveWord(index())}
 									variant="dashed"
 									aria-label="remove"
 									colorScheme="danger"
@@ -205,7 +206,7 @@ export function PageDashBoard() {
 					</ListItem>
 					<ListItem>
 						<ListIcon as={FaSolidHashtag} color="$success9" />
-						Найдено файлов: {media().files.length}
+						Найдено файлов: {files().length}
 					</ListItem>
 				</List>
 

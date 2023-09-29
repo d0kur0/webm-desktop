@@ -1,7 +1,7 @@
 import { File } from "webm-grabber";
 import { Badge, Box, css, Spinner, useTheme } from "@hope-ui/solid";
 import { createMemo, createSignal } from "solid-js";
-import { getVendorName, isFileImage } from "../stores/media";
+import { getVendorName, isFileImage } from "../utils/grabbing";
 
 type FilePreviewProps = {
 	file: File;
@@ -38,6 +38,8 @@ export function FilePreview(props: FilePreviewProps) {
 	const [isLoading, setIsLoading] = createSignal(true);
 	const [isLoadingFailed, setIsLoadingFailed] = createSignal(false);
 
+	const [isHovered, setIsHovered] = createSignal(false);
+
 	return (
 		<Box
 			as="button"
@@ -56,7 +58,7 @@ export function FilePreview(props: FilePreviewProps) {
 		>
 			<img
 				alt="preview image"
-				src={props.file.previewUrl}
+				src={isHovered() && isImage() ? props.file.url : props.file.previewUrl}
 				onLoad={() => setIsLoading(false)}
 				onError={() => setIsLoadingFailed(true)}
 				style={{
@@ -64,6 +66,8 @@ export function FilePreview(props: FilePreviewProps) {
 					height: "100%",
 					"object-fit": "cover",
 				}}
+				onMouseLeave={() => setIsHovered(false)}
+				onMouseEnter={() => setIsHovered(true)}
 			/>
 
 			{isLoading() && (

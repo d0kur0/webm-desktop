@@ -1,96 +1,60 @@
-import { action, atom, computed, map, onMount } from "nanostores";
-import { $schema, $schemaActions } from "./schema";
-import { File, Files, Thread, Threads, VendorMethods } from "webm-grabber";
-import { $filter } from "./filter";
+import { action, computed, map, onMount, onSet } from "nanostores";
+import { $schema } from "./schema";
+import { Files, Thread, VendorMethods } from "webm-grabber";
+import { $exclude } from "./exclude";
+import { CACHE_TTL, createCache } from "../utils/cache";
+import { $loggerClear, $loggerWrite } from "./logger";
+import {
+	clearFilesByExclude,
+	clearThreadsByExclude,
+	getVendor,
+	unpackThreadsFromFiles,
+} from "../utils/grabbing";
 
-export const IMAGE_TYPES = ["png", "jpg", "webp", "gif", "jpeg"];
-
-export function isFileImage(file: File) {
-	const fileExtension = file.url.split("/").pop()?.split(".").pop() || "";
-	return IMAGE_TYPES.includes(fileExtension);
-}
-
-export function getVendorName(file: File): "2ch" | "4chan" {
-	const is2ch = file.rootThread.url.includes("2ch");
-	return is2ch ? "2ch" : "4chan";
-}
-
-const STORAGE_KEY = "media-cache";
 const MAX_QUEUE_SIZE = 30;
-const CACHE_LIFETIME_SECONDS = 3600;
 
-type Media = {
+type FilesStore = {
 	files: Files;
 	loading: boolean;
 	fromCache: boolean;
 };
 
-type MediaCache = {
-	files: Files;
-	updatedAt: string;
-};
-
 type ThreadsWithVendor = (Thread & { vendor: VendorMethods })[];
 
-const emptyCache = {
-	files: [],
-	updatedAt: getTimestamp() - CACHE_LIFETIME_SECONDS * 2,
-};
+const cache = createCache<Files>("media", CACHE_TTL.ONE_HOUR);
+const [files, fromCache, cacheExpired] = cache.read([]);
 
-function getTimestamp() {
-	return Math.floor(Date.now() / 1000);
-}
-
-const serializedCache = localStorage.getItem(STORAGE_KEY);
-const cache: MediaCache = serializedCache ? JSON.parse(serializedCache) : emptyCache;
-const isCacheExpired = getTimestamp() - CACHE_LIFETIME_SECONDS > +cache.updatedAt;
-
-function unpackThreadsFromFiles(files: Files) {
-	return files.reduce((threads, { rootThread }) => {
-		threads.find(v => v.id === rootThread.id) ||
-			threads.push({
-				...rootThread,
-				subject: rootThread.subject
-					?.replaceAll(/<[^>]*>?/gm, "")
-					?.replaceAll("&gt;", "")
-					?.replaceAll("&lt;", ""),
-			});
-		return threads;
-	}, [] as Threads);
-}
-
-function cleanupThreadsByFilter(threads: Threads) {
-	return threads.filter(
-		thread => !$filter.get().some(v => thread.subject?.toLowerCase().includes(v.toLowerCase())),
-	);
-}
-
-const initialFiles = isCacheExpired ? [] : cache.files;
-
-export const $media = map<Media>({
-	files: initialFiles,
-	loading: isCacheExpired,
-	fromCache: !isCacheExpired,
+export const $files = map<FilesStore>({
+	files,
+	fromCache,
+	loading: cacheExpired,
 });
 
-export const $status = atom<string | null>(null);
+onMount($files, () => {
+	const { fromCache } = $files.get();
+	fromCache || $filesFetch().catch(console.error);
+});
 
-export const fetchMedia = action($media, "fetchMedia", async () => {
+onSet($files, ({ newValue }) => cache.write(newValue.files));
+
+export const $filesFetch = action($files, "fetchMedia", async () => {
 	const schema = $schema.get();
-	$media.setKey("loading", true);
+	$files.setKey("loading", true);
 
 	const threadsMap = await Promise.all(
 		schema.map(async schemaItem => {
-			$status.set(`fetchThreads from ${schemaItem.vendor}`);
+			$loggerWrite(`Получение тредов от ${schemaItem.vendor}`);
 
 			const threads: ThreadsWithVendor = [];
 
 			for (const board of schemaItem.boards) {
 				if (!board.enabled) continue;
-				const vendor = $schemaActions.getVendor(schemaItem.vendor);
+
+				const vendor = getVendor(schemaItem.vendor);
+				const threadsResponse = await vendor.fetchThreads(board.name);
 
 				threads.push(
-					...(await vendor.fetchThreads(board.name)).map(thread => ({
+					...threadsResponse.map(thread => ({
 						...thread,
 						vendor,
 						vendorName: schemaItem.vendor,
@@ -103,17 +67,17 @@ export const fetchMedia = action($media, "fetchMedia", async () => {
 	);
 
 	const files: Files = [];
-	const threads = cleanupThreadsByFilter(threadsMap.flat()) as ThreadsWithVendor;
-	const initialThreadsCount = threads.length;
+	const threads = clearThreadsByExclude(threadsMap.flat(), $exclude.get()) as ThreadsWithVendor;
 
 	const fetchPartial = async (): Promise<void> => {
 		const threadsPart = threads.splice(0, MAX_QUEUE_SIZE);
 		if (!threadsPart.length) return;
 
-		$status.set(`fetchFiles of threads: ${initialThreadsCount - threads.length}/${initialThreadsCount}`);
-
 		const filesPartMap = await Promise.all(
-			threadsPart.map(({ vendor, ...thread }) => vendor.fetchFiles(thread)),
+			threadsPart.map(({ vendor, ...thread }) => {
+				$loggerWrite(`Получение файлов из треда: ${thread.id}`);
+				return vendor.fetchFiles(thread);
+			}),
 		);
 
 		files.push(...filesPartMap.flat());
@@ -122,33 +86,16 @@ export const fetchMedia = action($media, "fetchMedia", async () => {
 
 	await fetchPartial();
 
-	$status.set(null);
+	$loggerClear();
 
-	$media.setKey("files", files);
-	$media.setKey("loading", false);
-
-	localStorage.setItem(
-		STORAGE_KEY,
-		JSON.stringify({
-			files: files,
-			updatedAt: getTimestamp(),
-		}),
-	);
+	$files.setKey("files", files);
+	$files.setKey("loading", false);
 });
 
-onMount($media, () => {
-	$media.get().fromCache || fetchMedia().catch(console.error);
+export const $filteredFiles = computed([$files, $exclude], (media, exclude) => {
+	return clearFilesByExclude(media.files, exclude);
 });
 
-export const $filteredFiles = computed([$media, $filter], (media, filter) => {
-	return media.files.filter(
-		file =>
-			![file.name, file.rootThread.subject || ""].some(v =>
-				filter.some(w => v?.toLowerCase().includes(w?.toLowerCase())),
-			),
-	);
+export const $threads = computed([$files, $exclude], ({ files }, exclude) => {
+	return clearThreadsByExclude(unpackThreadsFromFiles(files), exclude);
 });
-
-export const $threads = computed($media, ({ files }) =>
-	cleanupThreadsByFilter(unpackThreadsFromFiles(files)),
-);

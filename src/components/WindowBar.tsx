@@ -1,47 +1,78 @@
-import { Box, Button, ButtonGroup, IconButton, SystemStyleObject, useColorMode } from "@hope-ui/solid";
+import { Box, IconButton, useColorMode } from "@hope-ui/solid";
 import { VsChromeMinimize } from "solid-icons/vs";
 import { CgMinimizeAlt } from "solid-icons/cg";
 import { IoClose } from "solid-icons/io";
 import { FiMaximize2, FiSun } from "solid-icons/fi";
-import { createSignal, For } from "solid-js";
-import { useNavigate } from "@solidjs/router";
+import { createMemo, createSignal, JSXElement } from "solid-js";
+import { useLocation, useNavigate } from "@solidjs/router";
 import { FaSolidMoon } from "solid-icons/fa";
 import { RiDevelopmentBugFill } from "solid-icons/ri";
 
 const { ipcRenderer } = window.require("electron");
 
-const css: SystemStyleObject = {
+const parentStyles = {
+	pl: 0,
+	pr: 10,
+	top: 0,
+	lefT: 0,
+	width: "100%",
+	zIndex: "200",
+	height: "var(--window-header-height)",
+	display: "flex",
+	position: "fixed",
+	useSelect: "none",
+	alignItems: "center",
+	borderBottom: "1px solid $neutral6",
+	backgroundColor: "$background",
+};
+
+const iconButtonStyles = {
 	scale: "0.8",
 	padding: "0",
 	borderRadius: "50%",
 };
 
-const initialPages = [
-	{
-		href: "/",
-		title: "Дашборда",
-		active: true,
-	},
-	{
-		href: "/shuffle",
-		title: "Рандомач",
-		active: false,
-	},
-	{
-		href: "/list",
-		title: "Списком",
-		active: false,
-	},
-	{
-		href: "/threads",
-		title: "Треды",
-		active: false,
-	},
-];
+type NavigationLinkProps = {
+	href: string;
+	children: JSXElement;
+};
+
+function NavigationLink(props: NavigationLinkProps) {
+	const location = useLocation();
+	const navigate = useNavigate();
+
+	const isActive = createMemo(() => location.pathname === props.href);
+
+	const handleClick = () => navigate(props.href);
+
+	return (
+		<Box
+			onClick={handleClick}
+			css={{
+				px: 16,
+				font: "inherit",
+				color: isActive() ? "$accent11" : "$neutral11",
+				height: "var(--window-header-height)",
+				cursor: "pointer",
+				fontSize: "0.8em",
+				borderTop: `2px solid ${isActive() ? "$accent10" : "transparent"}`,
+				transition: "0.4s",
+				fontWeight: "bolder",
+				backgroundColor: "transparent",
+
+				_focus: {
+					outline: "none",
+				},
+			}}
+			as="button"
+		>
+			{props.children}
+		</Box>
+	);
+}
 
 export function WindowBar() {
 	const { colorMode, toggleColorMode } = useColorMode();
-	const navigate = useNavigate();
 
 	const [isFullscreen, setIsFullscreen] = createSignal(false);
 	const [isDevToolsOpened, setIsDevToolsOpened] = createSignal(false);
@@ -59,14 +90,6 @@ export function WindowBar() {
 		ipcRenderer.send("window/close");
 	};
 
-	const [pages, setPages] = createSignal(initialPages);
-
-	const handleGotoPage = (index: number) => {
-		setPages(pages => pages.map((page, key) => ({ ...page, active: index === key })));
-		const { href } = pages()[index];
-		href && navigate(href);
-	};
-
 	const openDevTools = () => {
 		setIsDevToolsOpened(v => !v);
 		ipcRenderer.send("debug/openTools");
@@ -74,42 +97,19 @@ export function WindowBar() {
 
 	return (
 		<>
-			<Box
-				css={{
-					top: 0,
-					lefT: 0,
-					width: "100%",
-					zIndex: "200",
-					height: "var(--window-header-height)",
-					display: "flex",
-					padding: "0 15px",
-					position: "fixed",
-					useSelect: "none",
-					alignItems: "center",
-					backgroundColor: "$background",
-					borderBottom: "1px solid $neutral6",
-				}}
-			>
-				<ButtonGroup variant="outline" spacing="$2" display="flex" alignItems="center">
-					<For each={pages()}>
-						{({ title, active }, index) => (
-							<Button
-								variant="outline"
-								onClick={() => handleGotoPage(index())}
-								colorScheme={active ? "info" : undefined}
-								size="xs"
-							>
-								{title}
-							</Button>
-						)}
-					</For>
-				</ButtonGroup>
+			<Box css={parentStyles}>
+				<Box>
+					<NavigationLink href="/">Дашборда</NavigationLink>
+					<NavigationLink href="/shuffle">Рандомач</NavigationLink>
+					<NavigationLink href="/list">Списком</NavigationLink>
+					<NavigationLink href="/threads">Треды</NavigationLink>
+				</Box>
 
 				<Box css={{ "-webkit-app-region": "drag", flex: "1 1 0", height: "100%" }} />
 
 				<Box css={{ display: "flex", alignItems: "center" }}>
 					<IconButton
-						css={css}
+						css={iconButtonStyles}
 						icon={<RiDevelopmentBugFill />}
 						size="sm"
 						variant="dashed"
@@ -120,7 +120,7 @@ export function WindowBar() {
 
 					<IconButton
 						mr={24}
-						css={css}
+						css={iconButtonStyles}
 						icon={colorMode() === "dark" ? <FiSun /> : <FaSolidMoon />}
 						size="sm"
 						variant="dashed"
@@ -129,7 +129,7 @@ export function WindowBar() {
 					/>
 
 					<IconButton
-						css={css}
+						css={iconButtonStyles}
 						size="xs"
 						icon={<VsChromeMinimize />}
 						onClick={handleMinimize}
@@ -138,7 +138,7 @@ export function WindowBar() {
 					/>
 
 					<IconButton
-						css={css}
+						css={iconButtonStyles}
 						size="xs"
 						icon={isFullscreen() ? <CgMinimizeAlt /> : <FiMaximize2 />}
 						onClick={handleToggleFullScreen}
@@ -147,7 +147,7 @@ export function WindowBar() {
 					/>
 
 					<IconButton
-						css={css}
+						css={iconButtonStyles}
 						size="xs"
 						icon={<IoClose />}
 						onClick={handleCloseWindow}

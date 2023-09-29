@@ -9,7 +9,7 @@ export function PageThreads() {
 
 	const threads = useStore($threads);
 
-	const filteredThreads = createMemo(() =>
+	const threadsForRender = createMemo(() =>
 		threads().filter(thread => thread.subject?.toLowerCase().includes(searchQuery().toLowerCase())),
 	);
 
@@ -31,15 +31,15 @@ export function PageThreads() {
 			</form>
 
 			<Box mt={24}>
-				{!!filteredThreads().length && (
+				{!!threadsForRender().length && (
 					<Text color="$neutral9" fontSize="0.8em" mb={8}>
-						Тредов: {filteredThreads().length}
+						Тредов: {threadsForRender().length}
 					</Text>
 				)}
 
 				<List spacing="$3">
 					<For
-						each={filteredThreads()}
+						each={threadsForRender()}
 						fallback={
 							<Box
 								p={12}

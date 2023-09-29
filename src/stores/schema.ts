@@ -1,15 +1,7 @@
-import { fourChannelFactory, twoChannelFactory } from "webm-grabber";
-import { atom, map, onSet } from "nanostores";
-import { $fileTypes } from "./fileTypes";
+import { action, atom, map, onSet } from "nanostores";
 
-const STORAGE_KEY = "schema-cache";
-
-const vendorsMap = {
-	"2ch": twoChannelFactory,
-	"4chan": fourChannelFactory,
-};
-
-export type Vendors = keyof typeof vendorsMap;
+import { createCache } from "../utils/cache";
+import { Vendors } from "../utils/grabbing";
 
 export type Board = {
 	name: string;
@@ -128,33 +120,31 @@ const basedSchema: Schema = [
 	},
 ];
 
-function readFromCache() {
-	const cache = localStorage.getItem(STORAGE_KEY);
-	return cache ? (JSON.parse(cache) as Schema) : basedSchema;
-}
+const cache = createCache<Schema>("schema");
+const [cachedSchema] = cache.read(basedSchema);
 
-export const $schema = map<Schema>(readFromCache());
+export const $schema = map<Schema>(cachedSchema);
 export const $schemaChanged = atom(false);
 
-onSet($schema, ({ newValue }) => {
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(newValue));
+onSet($schema, ({ newValue }) => cache.write(newValue));
+
+export const $schemaReset = action($schema, "reset", store => {
+	store.set(basedSchema);
 });
 
-export const $schemaActions = {
-	resetSchema() {
-		localStorage.removeItem(STORAGE_KEY);
-		$schema.set(basedSchema);
-	},
-
-	toggleBoardEnabled(vendor: string, board: string, enabled?: boolean) {
+export const $schemaToggleBoardEnabled = action(
+	$schema,
+	"toggleBoardEnabled",
+	(store, vendor: Vendors, boardName: string, enabled?: boolean) => {
 		$schema.set(
-			$schema.get().map(v => {
-				if (v.vendor !== vendor) return v;
+			$schema.get().map(schemaItem => {
+				if (schemaItem.vendor !== vendor) return schemaItem;
+
 				return {
-					...v,
-					boards: v.boards.map(b => {
-						if (b.name !== board) return b;
-						return { ...b, enabled: enabled !== undefined ? enabled : !b.enabled };
+					...schemaItem,
+					boards: schemaItem.boards.map(board => {
+						if (board.name !== boardName) return board;
+						return { ...board, enabled: enabled !== undefined ? enabled : !board.enabled };
 					}),
 				};
 			}),
@@ -162,13 +152,4 @@ export const $schemaActions = {
 
 		$schemaChanged.set(true);
 	},
-
-	getVendor(name: keyof typeof vendorsMap) {
-		return vendorsMap[name]({
-			requiredFileTypes: $fileTypes
-				.get()
-				.filter(v => v.enabled)
-				.map(v => v.name),
-		});
-	},
-};
+);

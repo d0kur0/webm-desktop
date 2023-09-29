@@ -2,15 +2,15 @@ import { Box, Button, ButtonGroup, ButtonProps, IconButton, notificationService 
 import { useNavigate } from "@solidjs/router";
 import { IoClose } from "solid-icons/io";
 import { File } from "webm-grabber";
-import { $filterActions } from "../stores/filter";
-import { isFileImage } from "../stores/media";
 import { createMemo, onMount } from "solid-js";
 import { TbPlayerTrackNextFilled, TbPlayerTrackPrevFilled } from "solid-icons/tb";
+import { isFileImage } from "../utils/grabbing";
 
 type FileViewerProps = {
 	file: File;
 	onClose?(): void;
 	closable?: boolean;
+	fromThread?: boolean;
 };
 
 export function FileViewer(props: FileViewerProps) {
@@ -18,8 +18,6 @@ export function FileViewer(props: FileViewerProps) {
 	const navigate = useNavigate();
 
 	const handleHideThread = () => {
-		props.file.rootThread.subject && $filterActions.add(props.file.rootThread.subject);
-
 		notificationService.show({
 			title: "Сабж треда добавлен в бан ворды, все файлы скрыты",
 			status: "success",
@@ -57,7 +55,7 @@ export function FileViewer(props: FileViewerProps) {
 					<Box>{props.file.name || "Файл без имени"}</Box>
 
 					<ButtonGroup size="xs" colorScheme="info" variant="dashed" ml={16}>
-						<Button onClick={navigateToThread}>Открыть тред</Button>
+						{props.fromThread || <Button onClick={navigateToThread}>Открыть тред</Button>}
 						<Button onClick={handleHideThread}>Добавить тред в бан ворды</Button>
 					</ButtonGroup>
 				</Box>

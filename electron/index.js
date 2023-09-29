@@ -41,7 +41,6 @@ const createWindow = () => {
 
 	isDev && mainWindow.loadURL("http://localhost:3000");
 	isDev || mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
-	mainWindow.webContents.openDevTools({ mode: "bottom" });
 
 	const filter = {
 		urls: ["https://*.github.com/*", "https://*.4cdn.org/*"],

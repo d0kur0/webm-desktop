@@ -1,7 +1,6 @@
-import { map, onSet } from "nanostores";
+import { action, map, onSet } from "nanostores";
 import { $schemaChanged } from "./schema";
-
-const STORAGE_KEY = "file-types-cache";
+import { createCache } from "../utils/cache";
 
 export type AllowedTypes = "webm" | "mp4" | "jpg" | "png" | "gif";
 
@@ -35,26 +34,20 @@ const basedTypes: FileTypes = [
 	},
 ];
 
-function readFromCache() {
-	const cache = localStorage.getItem(STORAGE_KEY);
-	return cache ? (JSON.parse(cache) as FileTypes) : basedTypes;
-}
+const cache = createCache<FileTypes>("fileTypes");
+const [cachedFileTypes] = cache.read(basedTypes);
 
-export const $fileTypes = map<FileTypes>(readFromCache());
+export const $fileTypes = map<FileTypes>(cachedFileTypes);
 
-onSet($fileTypes, ({ newValue }) => {
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(newValue));
+onSet($fileTypes, ({ newValue }) => cache.write(newValue));
+
+export const $fileTypesToggleEnabled = action($fileTypes, "toggle", (store, name: AllowedTypes) => {
+	store.set(
+		store.get().map(type => {
+			if (type.name !== name) return type;
+			return { ...type, enabled: !type.enabled };
+		}),
+	);
+
+	$schemaChanged.set(true);
 });
-
-export const $fileTypesActions = {
-	toggle(name: AllowedTypes) {
-		$fileTypes.set(
-			$fileTypes.get().map(type => {
-				if (type.name !== name) return type;
-				return { ...type, enabled: !type.enabled };
-			}),
-		);
-
-		$schemaChanged.set(true);
-	},
-};
