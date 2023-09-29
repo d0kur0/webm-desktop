@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/d0kur0/webm-desktop/compare/v1.1.0...v1.2.0) (2023-09-29)
+
+
+### Features
+
+* change assets path's for release ([bb54e22](https://github.com/d0kur0/webm-desktop/commit/bb54e228b16de1c6b82a64228f84f60845eb9aeb))
+* remove uselss run key ([50f682c](https://github.com/d0kur0/webm-desktop/commit/50f682ca7e6e54603426d0a36528a3113b6c98bd))
+
 # [1.1.0](https://github.com/d0kur0/webm-desktop/compare/v1.0.2...v1.1.0) (2023-09-29)
 
 
