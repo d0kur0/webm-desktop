@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/d0kur0/webm-desktop/compare/v1.0.1...v1.0.2) (2023-09-29)
+
+
+### Bug Fixes
+
+* again test ci build and release ([9b5ebe3](https://github.com/d0kur0/webm-desktop/commit/9b5ebe35801ab867345bf134f41d3352c99d4806))
+
 ## [1.0.1](https://github.com/d0kur0/webm-desktop/compare/v1.0.0...v1.0.1) (2023-09-29)
 
 
