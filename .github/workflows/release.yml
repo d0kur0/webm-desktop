@@ -32,63 +32,71 @@ jobs:
           node-version: "18.x"
       - run: npm install
       - run: npm run make
+      - shell: bash
+        run: |
+          cp -r ./out/make ./out/build_windows
       - uses: actions/upload-artifact@v3
         with:
-          name: dist
-          path: ./out
+          name: dist-windows
+          path: ./out/build_windows
 
   build_linux:
     needs:
-      - build_windows
+      - lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: dist
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: "18.x"
       - run: npm install
       - run: npm run make
+      - run: cp -r ./out/make ./out/build_linux
       - uses: actions/upload-artifact@v3
         with:
-          name: dist
-          path: ./out
+          name: dist-linux
+          path: ./out/build_linux
 
   build_macos:
     needs:
-      - build_linux
+      - lint
     runs-on: macos-latest
     steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: dist
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: "18.x"
       - run: npm install
       - run: npm run make
+      - run: cp -r ./out/make ./out/build_macos
       - uses: actions/upload-artifact@v3
         with:
-          name: dist
-          path: ./out
+          name: dist-macos
+          path: ./out/build_macos
 
   release:
     needs:
+      - build_linux
+      - build_windows
       - build_macos
     runs-on: ubuntu-latest
     steps:
+      - run: sudo apt-get install -y tree
       - uses: actions/download-artifact@v3
         with:
-          name: dist
+          name: dist-windows
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist-linux
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist-macos
       - name: Checkout
         uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: "18.x"
-      - run: find . | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
+      - run: tree
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         env:
