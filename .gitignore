@@ -93,6 +93,7 @@ out/
 dist-linux/
 dist-windows/
 dist-macos/
+gh_assets/
 
 # Solidjs out
 dist/
