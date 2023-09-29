@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/d0kur0/webm-desktop/compare/v1.0.2...v1.1.0) (2023-09-29)
+
+
+### Features
+
+* add assets glob for release ([14fc518](https://github.com/d0kur0/webm-desktop/commit/14fc518b9bb531635f56adcfc616101219a4190c))
+
 ## [1.0.2](https://github.com/d0kur0/webm-desktop/compare/v1.0.1...v1.0.2) (2023-09-29)
 
 
