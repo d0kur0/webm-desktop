@@ -94,11 +94,11 @@ jobs:
           node-version: "18.x"
       - uses: actions/download-artifact@v3
       - run: mkdir gh_assets
-      - run: cp dist_linux/deb/x64/webm-desktop_*_amd64.deb gh_assets/webm-desktop_amd64.deb
-      - run: cp dist_windows/squirrel.windows/x64/webm-desktop-*\ Setup.exe gh_assets/webm-desktop_setup_amd64.exe
-      - run: cp dist_macos/zip/darwin/x64/webm-desktop-darwin-x64-*.zip gh_assets/webm-desktop-darwin-x64.zip
-      - run: cp dist_linux/rpm/x64/webm-desktop-*-1.x86_64.rpm gh_assets/webm-desktop-1.x86_64.rpm
-      - run: rm -rf {dist_linux,dist_windows,dist_macos}
+      - run: cp dist-linux/deb/x64/webm-desktop_*_amd64.deb gh_assets/webm-desktop_amd64.deb
+      - run: cp dist-windows/squirrel.windows/x64/webm-desktop-*\ Setup.exe gh_assets/webm-desktop_setup_amd64.exe
+      - run: cp dist-macos/zip/darwin/x64/webm-desktop-darwin-x64-*.zip gh_assets/webm-desktop-darwin-x64.zip
+      - run: cp dist-linux/rpm/x64/webm-desktop-*-1.x86_64.rpm gh_assets/webm-desktop-1.x86_64.rpm
+      - run: rm -rf {dist-linux,dist-windows,dist-macos}
       - run: tree
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
