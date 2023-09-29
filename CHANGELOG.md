@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/d0kur0/webm-desktop/compare/v1.2.0...v1.2.1) (2023-09-29)
+
+
+### Bug Fixes
+
+* maybe it works? ([a4167a5](https://github.com/d0kur0/webm-desktop/commit/a4167a5cbb5a2f3d9934340cbe117aa02c47a48b))
+
 # [1.2.0](https://github.com/d0kur0/webm-desktop/compare/v1.1.0...v1.2.0) (2023-09-29)
 
 
