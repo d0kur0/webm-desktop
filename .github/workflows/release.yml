@@ -77,7 +77,7 @@ jobs:
 
   release:
     needs:
-      - lint
+      - build_macos
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v3
