@@ -23,7 +23,7 @@ jobs:
       - run: npm run lint
 
   build_windows:
-    name: "Build app installer for Windows"
+    name: "Build app [Windows]"
     needs:
       - lint
     runs-on: windows-latest
@@ -43,7 +43,7 @@ jobs:
           path: ./out/build_windows
 
   build_linux:
-    name: "Build app installer for linux (deb, rpm)"
+    name: "Build app [Linux (deb, rpm)]"
     needs:
       - lint
     runs-on: ubuntu-latest
@@ -61,7 +61,7 @@ jobs:
           path: ./out/build_linux
 
   build_macos:
-    name: "Build portable app for MacOS"
+    name: "Build app [MacOS]"
     needs:
       - lint
     runs-on: macos-latest
@@ -94,6 +94,7 @@ jobs:
           node-version: "18.x"
       - uses: actions/download-artifact@v3
       - run: tree
+      - run: 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
         env:
