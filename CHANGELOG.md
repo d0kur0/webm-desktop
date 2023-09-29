@@ -1,3 +1,11 @@
+## [1.2.2](https://github.com/d0kur0/webm-desktop/compare/v1.2.1...v1.2.2) (2023-09-29)
+
+
+### Bug Fixes
+
+* path's of shit ([5f9b4c5](https://github.com/d0kur0/webm-desktop/commit/5f9b4c52da7cd39c13f8995a166991910abed4d9))
+* shit to ci scripts at bash ([8f49844](https://github.com/d0kur0/webm-desktop/commit/8f498440337bf3adf38be884ecfd19623dfb49b9))
+
 ## [1.2.1](https://github.com/d0kur0/webm-desktop/compare/v1.2.0...v1.2.1) (2023-09-29)
 
 
