@@ -7,10 +7,10 @@ module.exports = {
 			"@semantic-release/github",
 			{
 				assets: [
-					{ path: "gh_assets/webm-desktop_setup_amd64.exe" },
-					{ path: "gh_assets/webm-desktop-darwin-x64.zip" },
-					{ path: "gh_assets/webm-desktop_amd64.deb" },
-					{ path: "gh_assets/webm-desktop-1.x86_64.rpm" },
+					{ path: "gh_assets/webm-desktop_setup_amd64.exe", label: "Windows Installer" },
+					{ path: "gh_assets/webm-desktop-darwin-x64.zip", label: "MacOS app" },
+					{ path: "gh_assets/webm-desktop_amd64.deb", label: "Installer for Debian-based distro" },
+					{ path: "gh_assets/webm-desktop-1.x86_64.rpm", "Installer for RHat-based distro" },
 				],
 			},
 		],
