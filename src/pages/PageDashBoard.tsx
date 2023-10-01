@@ -15,12 +15,12 @@ import {
 } from "@hope-ui/solid";
 import { BsSignIntersectionSideFill } from "solid-icons/bs";
 import { useStore } from "@nanostores/solid";
-import { $schema, $schemaChanged, $schemaToggleBoardEnabled } from "../stores/schema";
+import { $schema, $schemaChanged, $schemaMutations } from "../stores/schema";
 import { For } from "solid-js";
-import { $fileTypes, $fileTypesToggleEnabled } from "../stores/fileTypes";
-import { $filesFetch, $filteredFiles, $threads } from "../stores/media";
+import { $fileTypes, $fileTypesMutations } from "../stores/fileTypes";
+import { $mediaMutations, $filteredFiles, $threads } from "../stores/media";
 import { FaSolidHashtag } from "solid-icons/fa";
-import { $exclude, $excludeAddWord, $excludeRemoveWord } from "../stores/exclude";
+import { $excludeRules, $excludeRulesMutations } from "../stores/excludeRules";
 import { IoClose } from "solid-icons/io";
 import { Empty } from "../components/Empty";
 
@@ -75,16 +75,17 @@ const switchThumbClass = css({
 
 export function PageDashBoard() {
 	const files = useStore($filteredFiles);
-	const exclude = useStore($exclude);
+	const exclude = useStore($excludeRules);
 	const schema = useStore($schema);
 	const threads = useStore($threads);
 	const fileTypes = useStore($fileTypes);
+	const schemaChanged = useStore($schemaChanged);
 
-	const handleToggleBoard = $schemaToggleBoardEnabled;
-	const handleToggleFileType = $fileTypesToggleEnabled;
+	const handleToggleBoard = $schemaMutations.toggleBoardEnabled;
+	const handleToggleFileType = $fileTypesMutations.toggleTypeEnabled;
 
 	const handleUpdateFiles = async () => {
-		await $filesFetch();
+		await $mediaMutations.fetch();
 		$schemaChanged.set(false);
 	};
 
@@ -94,21 +95,28 @@ export function PageDashBoard() {
 		const formData = new FormData(target);
 		const word = formData.get("word");
 		if (!word) return;
-
-		$excludeAddWord(word.toString());
+		$excludeRulesMutations.addWord(word.toString());
 		target.reset();
+	};
+
+	const handleRemoveExcludeWord = (index: number) => {
+		$excludeRulesMutations.removeWordByKey(index);
 	};
 
 	return (
 		<Box css={{ p: 16, display: "flex", gap: 32 }}>
 			<Box css={{ flex: "2 1 0" }}>
-				<Heading>Используемые борды</Heading>
+				<Heading css={{ display: "flex" }}>
+					<Box css={{ flex: "1 1 0" }}>Используемые борды</Box>
+					{schemaChanged() && (
+						<Text css={{ color: "$neutral10", fontSize: "0.8em", mr: 12 }}>Схема была изменена</Text>
+					)}
+					<Button size="xs" onClick={handleUpdateFiles} variant="dashed" colorScheme="warning">
+						Обновить файлы
+					</Button>
+				</Heading>
 
 				<Text css={{ my: 10, fontSize: "0.9em", color: "$neutral9" }}>Борды, с которых собирать файлы</Text>
-
-				<Button w="$full" my={8} size="sm" onClick={handleUpdateFiles} variant="dashed" colorScheme="warning">
-					Обновить файлы
-				</Button>
 
 				<Box css={{ display: "flex", gap: 30, mt: 8 }}>
 					<For each={schema()}>
@@ -187,7 +195,7 @@ export function PageDashBoard() {
 								<IconButton
 									size="xs"
 									icon={<IoClose />}
-									onClick={() => $excludeRemoveWord(index())}
+									onClick={() => handleRemoveExcludeWord(index())}
 									variant="dashed"
 									aria-label="remove"
 									colorScheme="danger"

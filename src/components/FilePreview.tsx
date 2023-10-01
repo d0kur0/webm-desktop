@@ -1,5 +1,5 @@
 import { File } from "webm-grabber";
-import { Badge, Box, css, Spinner, useTheme } from "@hope-ui/solid";
+import { Badge, Box, css, HStack, Spinner, Tag, useTheme } from "@hope-ui/solid";
 import { createMemo, createSignal } from "solid-js";
 import { getVendorName, isFileImage } from "../utils/grabbing";
 
@@ -22,7 +22,7 @@ const overlayStyles = css({
 });
 
 const badgeStyles = {
-	fontSize: "0.5rem",
+	fontSize: "0.6rem",
 };
 
 function stringLengthLimiter(string: string, maxLength = 36) {
@@ -33,8 +33,6 @@ export function FilePreview(props: FilePreviewProps) {
 	const isImage = createMemo(() => isFileImage(props.file));
 	const vendorNameOfFile = createMemo(() => getVendorName(props.file));
 
-	const theme = useTheme();
-
 	const [isLoading, setIsLoading] = createSignal(true);
 	const [isLoadingFailed, setIsLoadingFailed] = createSignal(false);
 
@@ -44,31 +42,55 @@ export function FilePreview(props: FilePreviewProps) {
 		<Box
 			as="button"
 			css={{
+				p: 0,
 				color: "$neutral10",
 				cursor: "pointer",
 				border: "none",
 				margin: 0,
-				padding: 0,
+				shadow: `2xl`,
+				display: "flex",
 				position: "relative",
 				overflow: "hidden",
-				boxShadow: `0 0 2px 3px ${theme().colors.neutral2}`,
 				borderRadius: 8,
+				flexDirection: "column",
+				backgroundColor: "$neutral4",
 			}}
 			onClick={props.onOpen}
+			onMouseLeave={() => setIsHovered(false)}
+			onMouseEnter={() => setIsHovered(true)}
 		>
-			<img
+			<Box
+				as="img"
 				alt="preview image"
+				css={{
+					width: "100%",
+					height: "20vw",
+					objectFit: "cover",
+				}}
 				src={isHovered() && isImage() ? props.file.url : props.file.previewUrl}
 				onLoad={() => setIsLoading(false)}
 				onError={() => setIsLoadingFailed(true)}
-				style={{
-					width: "100%",
-					height: "100%",
-					"object-fit": "cover",
-				}}
-				onMouseLeave={() => setIsHovered(false)}
-				onMouseEnter={() => setIsHovered(true)}
 			/>
+
+			<Box css={{ position: "absolute", top: 5, left: 5, display: "flex", gap: 8 }}>
+				<Badge colorScheme={isImage() ? "neutral" : "primary"} css={badgeStyles}>
+					{isImage() ? "Image" : "Video"}
+				</Badge>
+
+				<Badge colorScheme={vendorNameOfFile() ? "warning" : "success"} css={badgeStyles}>
+					{vendorNameOfFile()}
+				</Badge>
+
+				<Badge colorScheme="accent" css={badgeStyles}>
+					{props.file.name}
+				</Badge>
+			</Box>
+
+			<Box css={{ position: "absolute", bottom: 5, left: 5 }}>
+				<Badge colorScheme="info" css={badgeStyles}>
+					{stringLengthLimiter(props.file.rootThread.subject || "")}
+				</Badge>
+			</Box>
 
 			{isLoading() && (
 				<Box class={overlayStyles()}>
@@ -77,30 +99,6 @@ export function FilePreview(props: FilePreviewProps) {
 			)}
 
 			{isLoadingFailed() && <Box class={overlayStyles()}>Loading failed</Box>}
-
-			{isLoading() || (
-				<>
-					<Box css={{ position: "absolute", top: 5, left: 5, display: "flex", gap: 8 }}>
-						<Badge colorScheme={isImage() ? "neutral" : "primary"} css={badgeStyles}>
-							{isImage() ? "Image" : "Video"}
-						</Badge>
-
-						<Badge colorScheme={vendorNameOfFile() ? "warning" : "success"} css={badgeStyles}>
-							{vendorNameOfFile()}
-						</Badge>
-
-						<Badge colorScheme="accent" css={badgeStyles}>
-							{props.file.name}
-						</Badge>
-					</Box>
-
-					<Box css={{ position: "absolute", bottom: 5, left: 5 }}>
-						<Badge colorScheme="info" css={badgeStyles}>
-							{stringLengthLimiter(props.file.rootThread.subject || "")}
-						</Badge>
-					</Box>
-				</>
-			)}
 		</Box>
 	);
 }

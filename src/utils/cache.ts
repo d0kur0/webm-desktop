@@ -25,9 +25,9 @@ export function createCache<T>(cacheKey: string, TTL: CACHE_TTL = CACHE_TTL.UNLI
 			}
 
 			const cachedStruct = JSON.parse(cacheValue) as CacheStruct<T>;
-			const isCachedExpired = getTimestamp() - TTL > cachedStruct.updatedAt;
+			const isCacheExpired = getTimestamp() - TTL > cachedStruct.updatedAt;
 
-			return [cachedStruct.data, true, isCachedExpired];
+			return [cachedStruct.data, true, isCacheExpired];
 		},
 		write(value: T) {
 			const cacheStruct: CacheStruct<T> = {

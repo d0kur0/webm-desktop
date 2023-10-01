@@ -8,6 +8,7 @@ import { Empty } from "../components/Empty";
 import { useParams } from "@solidjs/router";
 import { File } from "webm-grabber";
 import { FileViewer } from "../components/FileViewer";
+import { Mason } from "solid-mason";
 
 const PAGE_LIMIT = 30;
 
@@ -65,7 +66,6 @@ export function PageListFiles() {
 				css={{
 					gap: 25,
 					display: "grid",
-					gridAutoRows: "15vw",
 					gridTemplateColumns: "repeat(5, 1fr)",
 				}}
 			>

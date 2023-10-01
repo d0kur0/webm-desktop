@@ -7,10 +7,12 @@ export type LogRecord = {
 
 export const $logger = atom<LogRecord[]>([]);
 
-export const $loggerWrite = action($logger, "write", (store, message: string) => {
+const write = action($logger, "write", (store, message: string) => {
 	store.set([...store.get(), { time: new Date(), message }]);
 });
 
-export const $loggerClear = action($logger, "clear", store => {
+const clear = action($logger, "clear", store => {
 	store.set([]);
 });
+
+export const $loggerMutations = { write, clear };

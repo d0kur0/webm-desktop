@@ -30,6 +30,7 @@
     "nanostores": "^0.9.3",
     "solid-icons": "^1.0.12",
     "solid-js": "^1.7.6",
+    "solid-mason": "^0.1.5",
     "solid-transition-group": "^0.0.10",
     "webm-grabber": "^1.1.1"
   },

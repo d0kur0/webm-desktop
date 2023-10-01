@@ -128,11 +128,11 @@ export const $schemaChanged = atom(false);
 
 onSet($schema, ({ newValue }) => cache.write(newValue));
 
-export const $schemaReset = action($schema, "reset", store => {
+const reset = action($schema, "reset", store => {
 	store.set(basedSchema);
 });
 
-export const $schemaToggleBoardEnabled = action(
+const toggleBoardEnabled = action(
 	$schema,
 	"toggleBoardEnabled",
 	(store, vendor: Vendors, boardName: string, enabled?: boolean) => {
@@ -153,3 +153,5 @@ export const $schemaToggleBoardEnabled = action(
 		$schemaChanged.set(true);
 	},
 );
+
+export const $schemaMutations = { reset, toggleBoardEnabled };

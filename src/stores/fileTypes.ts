@@ -41,7 +41,7 @@ export const $fileTypes = map<FileTypes>(cachedFileTypes);
 
 onSet($fileTypes, ({ newValue }) => cache.write(newValue));
 
-export const $fileTypesToggleEnabled = action($fileTypes, "toggle", (store, name: AllowedTypes) => {
+const toggleTypeEnabled = action($fileTypes, "toggleTypeEnabled", (store, name: AllowedTypes) => {
 	store.set(
 		store.get().map(type => {
 			if (type.name !== name) return type;
@@ -51,3 +51,5 @@ export const $fileTypesToggleEnabled = action($fileTypes, "toggle", (store, name
 
 	$schemaChanged.set(true);
 });
+
+export const $fileTypesMutations = { toggleTypeEnabled };
