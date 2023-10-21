@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/d0kur0/webm-desktop/compare/v1.1.0...v1.2.0) (2023-10-21)
+
+
+### Features
+
+* add copy button ([#1](https://github.com/d0kur0/webm-desktop/issues/1)) ([a138a88](https://github.com/d0kur0/webm-desktop/commit/a138a88ece295bc1d0131d317870f815c483620c))
+
 # [1.1.0](https://github.com/d0kur0/webm-desktop/compare/v1.0.0...v1.1.0) (2023-10-21)
 
 
