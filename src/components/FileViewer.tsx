@@ -1,7 +1,7 @@
 import { Box, Button, ButtonGroup, IconButton, Spinner } from "@hope-ui/solid";
 import { useNavigate } from "@solidjs/router";
 import { IoClose } from "solid-icons/io";
-import { createEffect, createMemo, createSignal } from "solid-js";
+import { onMount, createMemo, createSignal, onCleanup } from "solid-js";
 import { ExtendedFile, isFileImage } from "../utils/grabbing";
 
 type FileViewerProps = {
@@ -29,16 +29,14 @@ export function FileViewer(props: FileViewerProps) {
 	const [isLoading, setIsLoading] = createSignal(true);
 	const [isLoadingFailed, setIsLoadingFailed] = createSignal(false);
 
-	createEffect(() => {
-		const listener = (event: KeyboardEvent) => {
-			event.key === "Escape" && props.onClose?.();
-			event.key === "ArrowLeft" && props.onPrev?.();
-			event.key === "ArrowRight" && props.onNext?.();
-		};
+	const listener = (event: KeyboardEvent) => {
+		event.key === "Escape" && props.onClose?.();
+		event.key === "ArrowLeft" && props.onPrev?.();
+		event.key === "ArrowRight" && props.onNext?.();
+	};
 
-		window.addEventListener("keydown", listener);
-		return () => window.removeEventListener("keydown", listener);
-	});
+	onMount(() => window.addEventListener("keydown", listener));
+	onCleanup(() => window.removeEventListener("keydown", listener));
 
 	const navigateToThread = () => {
 		navigate(`/thread/${props.file.rootThread.board}/${props.file.rootThread.id}`);

@@ -54,9 +54,10 @@ export function PageListFiles() {
 	};
 
 	const handleAddToExcludeThreads = () => {
-		if (!thread()) return;
+		const threadInfo = thread();
+		if (!threadInfo) return;
 
-		$excludeRulesMutations.addThread({ id: thread()?.id!, board: thread()?.board! });
+		$excludeRulesMutations.addThread({ id: threadInfo.id, board: threadInfo.board });
 
 		notificationService.show({
 			title: "Добавлено в исключения",
@@ -65,9 +66,17 @@ export function PageListFiles() {
 	};
 
 	const handleAddToExcludeWords = () => {
-		if (!thread()?.subject) return;
+		const threadInfo = thread();
 
-		$excludeRulesMutations.addWord(thread()?.subject!);
+		if (!threadInfo?.subject) {
+			return notificationService.show({
+				title: "Ошибка",
+				status: "danger",
+				description: "Тред невозможно добавить в бан-ворды, нет сабжа, попробуй скрыть по ID",
+			});
+		}
+
+		$excludeRulesMutations.addWord(threadInfo.subject);
 
 		notificationService.show({
 			title: "Добавлено в бан ворды",
