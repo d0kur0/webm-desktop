@@ -35,6 +35,10 @@ export function FileViewer(props: FileViewerProps) {
 		event.key === "ArrowRight" && props.onNext?.();
 	};
 
+	const handleCopy = async () => {
+		await navigator.clipboard.writeText(props.file.url);
+	};
+
 	onMount(() => window.addEventListener("keydown", listener));
 	onCleanup(() => window.removeEventListener("keydown", listener));
 
@@ -144,6 +148,8 @@ export function FileViewer(props: FileViewerProps) {
 				<ButtonGroup colorScheme="accent" size="xs">
 					<Button onClick={props.onPrev}>prev</Button>
 					<Button onClick={props.onNext}>next</Button>
+
+					<Button onClick={() => handleCopy()}>copy</Button>
 				</ButtonGroup>
 			</Box>
 		</Box>
