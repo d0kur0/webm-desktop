@@ -1,3 +1,18 @@
+# [1.1.0](https://github.com/d0kur0/webm-desktop/compare/v1.0.0...v1.1.0) (2023-10-21)
+
+
+### Bug Fixes
+
+* add top margin for 'Сводка' heading [skip ci] ([deb3cc3](https://github.com/d0kur0/webm-desktop/commit/deb3cc371be1deb00d9740137024896809ae52c9))
+* fight with linter, win ([b9a0f84](https://github.com/d0kur0/webm-desktop/commit/b9a0f84882a8cfc9e21bc7b3f56432dda58cd338))
+* update README and trigger release ([3ff302b](https://github.com/d0kur0/webm-desktop/commit/3ff302b560f4accc8c8be0f78614fb1fa0f8716a))
+
+
+### Features
+
+* make some shit ([dc1407b](https://github.com/d0kur0/webm-desktop/commit/dc1407bf0cc40e9de27bb6ae90ae82b3d302d992))
+* random refactoring, and? [skip ci] ([e214376](https://github.com/d0kur0/webm-desktop/commit/e214376cbe70dbebd0cefaeccb1a33c9602ed328))
+
 # 1.0.0 (2023-09-29)
 
 
