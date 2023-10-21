@@ -1,33 +1,47 @@
-import { Box, Button, ButtonGroup, ButtonProps, IconButton, notificationService } from "@hope-ui/solid";
+import { Box, Button, ButtonGroup, IconButton, Spinner } from "@hope-ui/solid";
 import { useNavigate } from "@solidjs/router";
 import { IoClose } from "solid-icons/io";
-import { File } from "webm-grabber";
-import { createMemo, onMount } from "solid-js";
-import { TbPlayerTrackNextFilled, TbPlayerTrackPrevFilled } from "solid-icons/tb";
-import { isFileImage } from "../utils/grabbing";
+import { createEffect, createMemo, createSignal } from "solid-js";
+import { ExtendedFile, isFileImage } from "../utils/grabbing";
 
 type FileViewerProps = {
-	file: File;
-	onClose?(): void;
+	file: ExtendedFile;
 	closable?: boolean;
+	onClose?(): void;
 	fromThread?: boolean;
+
+	onNext?: () => void;
+	onPrev?: () => void;
+};
+
+const centerPositionStyles = {
+	top: "50%",
+	left: "50%",
+	zIndex: 1233,
+	position: "absolute",
+	transform: "translate(-50%, -50%)",
 };
 
 export function FileViewer(props: FileViewerProps) {
 	const isImage = createMemo(() => isFileImage(props.file));
 	const navigate = useNavigate();
 
-	const handleHideThread = () => {
-		notificationService.show({
-			title: "Сабж треда добавлен в бан ворды, все файлы скрыты",
-			status: "success",
-		});
+	const [isLoading, setIsLoading] = createSignal(true);
+	const [isLoadingFailed, setIsLoadingFailed] = createSignal(false);
 
-		props.onClose?.();
-	};
+	createEffect(() => {
+		const listener = (event: KeyboardEvent) => {
+			event.key === "Escape" && props.onClose?.();
+			event.key === "ArrowLeft" && props.onPrev?.();
+			event.key === "ArrowRight" && props.onNext?.();
+		};
+
+		window.addEventListener("keydown", listener);
+		return () => window.removeEventListener("keydown", listener);
+	});
 
 	const navigateToThread = () => {
-		navigate(`/thread/${props.file.rootThread.id}`);
+		navigate(`/thread/${props.file.rootThread.board}/${props.file.rootThread.id}`);
 	};
 
 	return (
@@ -51,37 +65,46 @@ export function FileViewer(props: FileViewerProps) {
 					justifyContent: "space-between",
 				}}
 			>
-				<Box css={{ color: "$neutral9", display: "flex" }}>
-					<Box>{props.file.name || "Файл без имени"}</Box>
+				<Box css={{ color: "$neutral9", display: "flex", flex: "1 1 0" }}>
+					<Box css={{ flex: "1 1 0" }}>{props.file.name || "Файл без имени"}</Box>
 
 					<ButtonGroup size="xs" colorScheme="info" variant="dashed" ml={16}>
 						{props.fromThread || <Button onClick={navigateToThread}>Открыть тред</Button>}
-						<Button onClick={handleHideThread}>Добавить тред в бан ворды</Button>
+
+						{props.closable && (
+							<Box>
+								<IconButton
+									size="xs"
+									icon={<IoClose />}
+									variant="outline"
+									onClick={props.onClose}
+									aria-label="close"
+									colorScheme="warning"
+								/>
+							</Box>
+						)}
 					</ButtonGroup>
 				</Box>
-				{props.closable && (
-					<Box>
-						<IconButton
-							size="xs"
-							icon={<IoClose />}
-							variant="outline"
-							onClick={props.onClose}
-							aria-label="close"
-							colorScheme="warning"
-						/>
-					</Box>
-				)}
 			</Box>
 
-			<Box css={{ height: "calc(100vh - 106px)", display: "flex", flexDirection: "column" }}>
+			<Box css={{ height: "calc(100vh - 156px)", display: "flex", flexDirection: "column" }}>
 				<Box
 					css={{
 						height: "100%",
 						display: "flex",
+						position: "relative",
 						alignItems: "center",
 						justifyContent: "center",
 					}}
 				>
+					{isLoading() && (
+						<Box css={centerPositionStyles}>
+							<Spinner />
+						</Box>
+					)}
+
+					{isLoadingFailed() && <Box css={centerPositionStyles}>Loading failed</Box>}
+
 					<Box
 						css={{
 							width: "100%",
@@ -91,141 +114,40 @@ export function FileViewer(props: FileViewerProps) {
 							justifyContent: "center",
 						}}
 					>
-						{isImage() && <ImagePlayer file={props.file} />}
-						{isImage() || <VideoPlayer file={props.file} />}
+						{isImage() && (
+							<Box
+								as="img"
+								css={{ height: "100%" }}
+								src={props.file.url}
+								alt={props.file.name}
+								onLoad={() => setIsLoading(false)}
+								onError={() => setIsLoadingFailed(true)}
+							/>
+						)}
+
+						{isImage() || (
+							<Box
+								as="video"
+								css={{ height: "100%", width: "100%" }}
+								src={props.file.url}
+								loop
+								autoplay
+								controls
+								preload="metadata"
+								onError={() => setIsLoadingFailed(true)}
+								onLoadedData={() => setIsLoading(false)}
+							/>
+						)}
 					</Box>
 				</Box>
 			</Box>
-		</Box>
-	);
-}
 
-type PlayerProps = {
-	file: File;
-	onNext?(): void;
-	onPrev?(): void;
-};
-
-function ImagePlayer(props: PlayerProps) {
-	return (
-		<Box
-			css={{
-				position: "relative",
-				width: "100%",
-				display: "flex",
-				alignItems: "center",
-				justifyContent: "center",
-			}}
-		>
-			<Box
-				css={{
-					height: "calc(100vh - 104px)",
-				}}
-				as="img"
-				src={props.file.url}
-				alt={props.file.name}
-			/>
-
-			<Box
-				css={{
-					gap: 2,
-					left: 10,
-					bottom: 10,
-					display: "flex",
-					position: "absolute",
-					alignItems: "center",
-				}}
-			>
-				<CustomPlayerButton onClick={props.onPrev}>
-					<TbPlayerTrackPrevFilled />
-				</CustomPlayerButton>
-				<CustomPlayerButton onClick={props.onNext}>
-					<TbPlayerTrackNextFilled />
-				</CustomPlayerButton>
+			<Box css={{ p: 16, display: "flex", alignItems: "center", gap: 12 }}>
+				<ButtonGroup colorScheme="accent" size="xs">
+					<Button onClick={props.onPrev}>prev</Button>
+					<Button onClick={props.onNext}>next</Button>
+				</ButtonGroup>
 			</Box>
 		</Box>
-	);
-}
-
-function VideoPlayer(props: PlayerProps) {
-	let videoRef: HTMLVideoElement;
-
-	const handleVolumeChange = () => {
-		localStorage.videoVolume = videoRef.volume;
-	};
-
-	const handleTimeUpdate = () => {
-		videoRef.removeAttribute("controls");
-		videoRef.setAttribute("controls", "");
-	};
-
-	onMount(() => {
-		videoRef && (videoRef.volume = +localStorage.videoVolume || 0.5);
-	});
-
-	return (
-		<Box css={{ width: "100%", height: "100%", position: "relative" }}>
-			<Box
-				as="video"
-				ref={(el: HTMLVideoElement) => (videoRef = el)}
-				css={{
-					width: "100%",
-					height: "calc(100vh - 104px)",
-				}}
-				src={props.file.url}
-				poster={props.file.previewUrl}
-				autoplay
-				controls
-				onTimeUpdate={handleTimeUpdate}
-				onVolumeChange={handleVolumeChange}
-			/>
-
-			<Box
-				css={{
-					gap: 2,
-					left: 130,
-					bottom: 30,
-					display: "flex",
-					position: "absolute",
-					alignItems: "center",
-				}}
-			>
-				<CustomPlayerButton onClick={props.onPrev}>
-					<TbPlayerTrackPrevFilled />
-				</CustomPlayerButton>
-				<CustomPlayerButton onClick={props.onNext}>
-					<TbPlayerTrackNextFilled />
-				</CustomPlayerButton>
-			</Box>
-		</Box>
-	);
-}
-
-function CustomPlayerButton(props: ButtonProps) {
-	return (
-		<Box
-			{...props}
-			as="button"
-			css={{
-				color: "#fff",
-				width: 36,
-				cursor: "pointer",
-				height: 36,
-				margin: 0,
-				border: "none",
-				display: "flex",
-				padding: 0,
-				lineHeight: 0,
-				transition: "0.3s",
-				alignItems: "center",
-				borderRadius: "100%",
-				justifyContent: "center",
-				backgroundColor: "transparent",
-
-				_hover: {
-					backgroundColor: "#1A1B1E",
-				},
-			}}
-		/>
 	);
 }

@@ -22,17 +22,18 @@
   "dependencies": {
     "@hope-ui/solid": "^0.6.7",
     "@nanostores/solid": "^0.4.2",
+    "@solid-primitives/masonry": "^0.0.4",
     "@solid-primitives/scheduled": "^1.4.1",
     "@solidjs/router": "^0.8.3",
     "@stitches/core": "^1.2.8",
+    "bricks.js": "^1.8.0",
     "electron-squirrel-startup": "^1.0.0",
-    "lodash": "^4.17.21",
     "nanostores": "^0.9.3",
     "solid-icons": "^1.0.12",
     "solid-js": "^1.7.6",
     "solid-mason": "^0.1.5",
     "solid-transition-group": "^0.0.10",
-    "webm-grabber": "^1.1.1"
+    "webm-grabber": "^1.2.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.4.2",

@@ -13,21 +13,32 @@ export function getTimestamp() {
 	return Math.floor(Date.now() / 1000);
 }
 
-type ReadResult<T> = [T, boolean, boolean];
-
 export function createCache<T>(cacheKey: string, TTL: CACHE_TTL = CACHE_TTL.UNLIMITED) {
+	let EXPIRED = false;
+
 	return {
-		read(fallback: T): ReadResult<T> {
+		get EXPIRED() {
+			return EXPIRED;
+		},
+
+		read(): T | null {
 			const cacheValue = localStorage.getItem(cacheKey);
 
 			if (cacheValue === null) {
-				return [fallback, false, false];
+				return null;
 			}
 
 			const cachedStruct = JSON.parse(cacheValue) as CacheStruct<T>;
-			const isCacheExpired = getTimestamp() - TTL > cachedStruct.updatedAt;
+			const isCacheExpired =
+				TTL === CACHE_TTL.UNLIMITED ? false : getTimestamp() - TTL > cachedStruct.updatedAt;
 
-			return [cachedStruct.data, true, isCacheExpired];
+			EXPIRED = isCacheExpired;
+
+			if (isCacheExpired) {
+				return null;
+			}
+
+			return cachedStruct.data;
 		},
 		write(value: T) {
 			const cacheStruct: CacheStruct<T> = {

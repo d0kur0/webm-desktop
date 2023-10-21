@@ -7,6 +7,10 @@ import { createMemo, createSignal, JSXElement } from "solid-js";
 import { useLocation, useNavigate } from "@solidjs/router";
 import { FaSolidMoon } from "solid-icons/fa";
 import { RiDevelopmentBugFill } from "solid-icons/ri";
+import { RiSystemDashboardLine } from "solid-icons/ri";
+import { TbArrowsRandom } from "solid-icons/tb";
+import { TbListDetails } from "solid-icons/tb";
+import { BsSignIntersectionT } from "solid-icons/bs";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -34,6 +38,7 @@ const iconButtonStyles = {
 
 type NavigationLinkProps = {
 	href: string;
+	icon?: JSXElement;
 	children: JSXElement;
 };
 
@@ -50,14 +55,17 @@ function NavigationLink(props: NavigationLinkProps) {
 			onClick={handleClick}
 			css={{
 				px: 16,
+				gap: 5,
 				font: "inherit",
 				color: isActive() ? "$accent11" : "$neutral11",
 				height: "var(--window-header-height)",
 				cursor: "pointer",
+				display: "flex",
 				fontSize: "0.8em",
 				borderTop: `2px solid ${isActive() ? "$accent10" : "transparent"}`,
 				transition: "0.4s",
 				fontWeight: "bolder",
+				alignItems: "center",
 				backgroundColor: "transparent",
 
 				_focus: {
@@ -66,6 +74,8 @@ function NavigationLink(props: NavigationLinkProps) {
 			}}
 			as="button"
 		>
+			{props.icon && <Box css={{ fontSize: "1.2em" }}>{props.icon}</Box>}
+
 			{props.children}
 		</Box>
 	);
@@ -98,11 +108,19 @@ export function WindowBar() {
 	return (
 		<>
 			<Box css={parentStyles}>
-				<Box>
-					<NavigationLink href="/">Дашборда</NavigationLink>
-					<NavigationLink href="/shuffle">Рандомач</NavigationLink>
-					<NavigationLink href="/list">Списком</NavigationLink>
-					<NavigationLink href="/threads">Треды</NavigationLink>
+				<Box css={{ display: "flex", alignItems: "center", height: "100%" }}>
+					<NavigationLink icon={<RiSystemDashboardLine />} href="/">
+						Дашборда
+					</NavigationLink>
+					<NavigationLink icon={<TbArrowsRandom />} href="/shuffle">
+						Рандомач
+					</NavigationLink>
+					<NavigationLink icon={<TbListDetails />} href="/list">
+						Списком
+					</NavigationLink>
+					<NavigationLink icon={<BsSignIntersectionT />} href="/threads">
+						Треды
+					</NavigationLink>
 				</Box>
 
 				<Box css={{ "-webkit-app-region": "drag", flex: "1 1 0", height: "100%" }} />

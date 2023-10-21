@@ -4,6 +4,8 @@ import { Thread } from "webm-grabber";
 
 const basedWordsForExclude = ["gay", "trap", "трап"];
 
+const initialState = { words: basedWordsForExclude, threads: [] };
+
 export type SimplifiedThread = Pick<Thread, "board" | "id">;
 
 export type ExcludeRulesStore = {
@@ -12,9 +14,9 @@ export type ExcludeRulesStore = {
 };
 
 const cache = createCache<ExcludeRulesStore>("exclude");
-const [cachedExcludes] = cache.read({ words: basedWordsForExclude, threads: [] });
+const cachedValue = cache.read();
 
-export const $excludeRules = map<ExcludeRulesStore>(cachedExcludes);
+export const $excludeRules = map<ExcludeRulesStore>(cachedValue || initialState);
 
 onSet($excludeRules, ({ newValue }) => cache.write(newValue));
 

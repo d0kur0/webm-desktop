@@ -11,7 +11,7 @@ export type FileType = {
 
 export type FileTypes = FileType[];
 
-const basedTypes: FileTypes = [
+const initialState: FileTypes = [
 	{
 		name: "webm",
 		enabled: true,
@@ -35,9 +35,9 @@ const basedTypes: FileTypes = [
 ];
 
 const cache = createCache<FileTypes>("fileTypes");
-const [cachedFileTypes] = cache.read(basedTypes);
+const cachedValue = cache.read();
 
-export const $fileTypes = map<FileTypes>(cachedFileTypes);
+export const $fileTypes = map<FileTypes>(cachedValue || initialState);
 
 onSet($fileTypes, ({ newValue }) => cache.write(newValue));
 

@@ -1,12 +1,15 @@
 import { action, computed, map, onMount, onSet } from "nanostores";
 import { $schema } from "./schema";
-import { Files, Thread, VendorMethods } from "webm-grabber";
+import { VendorMethods } from "webm-grabber";
 import { $excludeRules } from "./excludeRules";
 import { CACHE_TTL, createCache } from "../utils/cache";
 import {
 	clearFilesByExclude,
 	clearThreadsByExclude,
-	getVendor,
+	compareThreads,
+	ExtendedFiles,
+	ExtendedThread,
+	getVendorInstance,
 	unpackThreadsFromFiles,
 } from "../utils/grabbing";
 import { $loggerMutations } from "./logger";
@@ -14,24 +17,25 @@ import { $loggerMutations } from "./logger";
 const MAX_QUEUE_SIZE = 30;
 
 type FilesStore = {
-	files: Files;
+	files: ExtendedFiles;
 	loading: boolean;
 	fromCache: boolean;
 };
 
-type ThreadsWithVendor = (Thread & { vendor: VendorMethods })[];
+type ThreadsWithVendor = (ExtendedThread & { vendor: VendorMethods })[];
 
-const cache = createCache<Files>("media", CACHE_TTL.ONE_HOUR);
-const [files, fromCache, cacheExpired] = cache.read([]);
+const cache = createCache<ExtendedFiles>("media", CACHE_TTL.ONE_HOUR);
+const cachedValue = cache.read();
+const isCacheEmpty = !cachedValue;
 
 export const $files = map<FilesStore>({
-	files,
-	fromCache,
-	loading: cacheExpired,
+	files: cachedValue || [],
+	loading: isCacheEmpty,
+	fromCache: !isCacheEmpty,
 });
 
 onMount($files, () => {
-	cacheExpired && fetch().catch(console.error);
+	isCacheEmpty && fetch().catch(console.error);
 });
 
 onSet($files, ({ newValue }) => cache.write(newValue.files));
@@ -49,13 +53,14 @@ const fetch = action($files, "fetchMedia", async () => {
 			for (const board of schemaItem.boards) {
 				if (!board.enabled) continue;
 
-				const vendor = getVendor(schemaItem.vendor);
+				const vendor = getVendorInstance(schemaItem.vendor);
 				const threadsResponse = await vendor.fetchThreads(board.name);
 
 				threads.push(
 					...threadsResponse.map(thread => ({
 						...thread,
 						vendor,
+						countFiles: 0,
 						vendorName: schemaItem.vendor,
 					})),
 				);
@@ -65,7 +70,7 @@ const fetch = action($files, "fetchMedia", async () => {
 		}),
 	);
 
-	const files: Files = [];
+	const files: ExtendedFiles = [];
 	const threads = clearThreadsByExclude(threadsMap.flat(), $excludeRules.get()) as ThreadsWithVendor;
 
 	const fetchPartial = async (): Promise<void> => {
@@ -73,9 +78,13 @@ const fetch = action($files, "fetchMedia", async () => {
 		if (!threadsPart.length) return;
 
 		const filesPartMap = await Promise.all(
-			threadsPart.map(({ vendor, ...thread }) => {
+			threadsPart.map(async ({ vendor, vendorName, ...thread }) => {
 				$loggerMutations.write(`Получение файлов из треда: ${thread.id}`);
-				return vendor.fetchFiles(thread);
+				const files = await vendor.fetchFiles(thread);
+				return files.map(file => ({
+					...file,
+					rootThread: { ...file.rootThread, vendorName, countFiles: 0 },
+				}));
 			}),
 		);
 
@@ -91,7 +100,12 @@ const fetch = action($files, "fetchMedia", async () => {
 	$files.setKey("loading", false);
 });
 
-export const $mediaMutations = { fetch };
+const countFiles = action($files, "countFiles", (_, thread: ExtendedThread) => {
+	const { files } = $files.get();
+	return files.reduce((acc, f) => acc + +compareThreads(f.rootThread, thread), 0);
+});
+
+export const $mediaMutations = { fetch, countFiles };
 
 export const $filteredFiles = computed([$files, $excludeRules], (media, exclude) => {
 	return clearFilesByExclude(media.files, exclude);

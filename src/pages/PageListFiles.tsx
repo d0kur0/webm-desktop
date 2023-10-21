@@ -1,32 +1,34 @@
-import { Box, Heading, Anchor } from "@hope-ui/solid";
-import { createMemo, createSignal, For } from "solid-js";
+import { Box, Heading, Anchor, Tooltip, Button, ButtonGroup, notificationService } from "@hope-ui/solid";
+import { createMemo, createSignal } from "solid-js";
 import { useStore } from "@nanostores/solid";
 import { $filteredFiles, $threads } from "../stores/media";
-import { FilePreview } from "../components/FilePreview";
 import { debounce } from "@solid-primitives/scheduled";
-import { Empty } from "../components/Empty";
 import { useParams } from "@solidjs/router";
-import { File } from "webm-grabber";
 import { FileViewer } from "../components/FileViewer";
-import { Mason } from "solid-mason";
+import { createMasonryBreakpoints, Mason } from "solid-mason";
+import { FilePreview } from "../components/FilePreview";
+import { ImBlocked, ImEyeBlocked } from "solid-icons/im";
+import { $excludeRulesMutations } from "../stores/excludeRules";
 
-const PAGE_LIMIT = 30;
+const PAGE_LIMIT = 70;
 
 export function PageListFiles() {
+	const { board, threadId } = useParams();
+
 	const files = useStore($filteredFiles);
 	const threads = useStore($threads);
 
-	const [openedFile, setOpenedFile] = createSignal<File | null>(null);
-
 	const [page, setPage] = createSignal(1);
+	const [getOpenedFileIndex, setOpenedFileIndex] = createSignal<number | null>(null);
 
-	const { threadId } = useParams();
-	const thread = createMemo(() => threads().find(t => t.id === +threadId));
+	const thread = createMemo(() => threads().find(t => t.id === +threadId && t.board === board));
 
 	const usedFiles = createMemo(() => {
 		if (!threadId) return files();
 		return files().filter(({ rootThread }) => rootThread.id === +threadId);
 	});
+
+	const openedFile = createMemo(() => usedFiles()[getOpenedFileIndex()!]);
 
 	const filesForRender = createMemo(() => usedFiles().slice(0, page() * PAGE_LIMIT));
 
@@ -35,44 +37,97 @@ export function PageListFiles() {
 		isReadyForLoad && setPage(page => page + 1);
 	}, 250);
 
+	const breakpoints = createMasonryBreakpoints(() => [
+		{ query: "(min-width: 1536px)", columns: 6 },
+		{ query: "(min-width: 1280px) and (max-width: 1536px)", columns: 5 },
+		{ query: "(min-width: 1024px) and (max-width: 1280px)", columns: 4 },
+		{ query: "(min-width: 768px) and (max-width: 1024px)", columns: 3 },
+		{ query: "(max-width: 768px)", columns: 2 },
+	]);
+
+	const handlePrev = () => {
+		setOpenedFileIndex(v => (v !== null ? (v - 1 < 0 ? v : v - 1) : v));
+	};
+
+	const handleNext = () => {
+		setOpenedFileIndex(v => (v !== null ? (usedFiles().length < v + 1 ? v : v + 1) : v));
+	};
+
+	const handleAddToExcludeThreads = () => {
+		if (!thread()) return;
+
+		$excludeRulesMutations.addThread({ id: thread()?.id!, board: thread()?.board! });
+
+		notificationService.show({
+			title: "Добавлено в исключения",
+			description: "Тред и его файлы скрыты",
+		});
+	};
+
+	const handleAddToExcludeWords = () => {
+		if (!thread()?.subject) return;
+
+		$excludeRulesMutations.addWord(thread()?.subject!);
+
+		notificationService.show({
+			title: "Добавлено в бан ворды",
+			description: "Все треды и файлы с этим набором слов скрыты",
+		});
+	};
+
 	return (
 		<Box
 			css={{ p: 16, overflowY: "auto", height: "calc(100vh - 56px)" }}
 			onScroll={handleRootScroll as never}
 		>
-			{openedFile() && (
+			{getOpenedFileIndex() !== null && (
 				<FileViewer
 					file={openedFile()!}
+					onClose={() => setOpenedFileIndex(null)}
+					onPrev={handlePrev}
+					onNext={handleNext}
 					closable
-					onClose={() => setOpenedFile(null)}
 					fromThread={!!thread()}
 				/>
 			)}
 
-			<Heading mb={12}>{threadId ? thread()?.subject : "Список файлов"}</Heading>
+			<Heading css={{ mb: 12, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
+				{threadId ? thread()?.subject : "Список файлов"}
+			</Heading>
 
 			{threadId && (
-				<Box css={{ mb: 16, mt: "-10px", color: "$neutral9", fontSize: "0.8em" }}>
-					<Box>Файлов в треде: {usedFiles().length}</Box>
+				<Box css={{ mb: 16, mt: "-10px", color: "$neutral9", fontSize: "0.8em", display: "flex" }}>
+					<Box css={{ flex: "1 1 0" }}>
+						<Box>Файлов в треде: {usedFiles().length}</Box>
+						<Box>
+							<Anchor external href={thread()?.url}>
+								Открыть источник
+							</Anchor>
+						</Box>
+					</Box>
 					<Box>
-						<Anchor external href={thread()?.url}>
-							Открыть источник
-						</Anchor>
+						<ButtonGroup size="sm" variant="dashed" colorScheme="warning">
+							<Tooltip withArrow label="Исключить тред по ID">
+								<Button onClick={handleAddToExcludeThreads}>
+									<ImEyeBlocked />
+								</Button>
+							</Tooltip>
+
+							<Tooltip withArrow label="Добавить тред в бан ворды">
+								<Button onClick={handleAddToExcludeWords}>
+									<ImBlocked />
+								</Button>
+							</Tooltip>
+						</ButtonGroup>
 					</Box>
 				</Box>
 			)}
 
-			<Box
-				css={{
-					gap: 25,
-					display: "grid",
-					gridTemplateColumns: "repeat(5, 1fr)",
-				}}
-			>
-				<For fallback={<Empty>Список пуст</Empty>} each={filesForRender()}>
-					{file => <FilePreview onOpen={() => setOpenedFile(file)} file={file} />}
-				</For>
-			</Box>
+			<Mason style={{ margin: "0 -10px" }} as="div" items={filesForRender()} columns={breakpoints()}>
+				{(file, index) => (
+					<FilePreview fromThread={!!thread()} onOpen={() => setOpenedFileIndex(index)} file={file} />
+				)}
+			</Mason>
 		</Box>
 	);
 }

@@ -18,7 +18,7 @@ function Routing() {
 			<Route path="/" component={PageDashBoard} />
 			<Route path="/list" component={PageListFiles} />
 			<Route path="/threads" component={PageThreads} />
-			<Route path="/thread/:threadId" component={PageListFiles} />
+			<Route path="/thread/:board/:threadId" component={PageListFiles} />
 			<Route path="/shuffle" component={PageShuffleFile} />
 		</Routes>
 	);

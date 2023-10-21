@@ -16,7 +16,7 @@ export type SchemaItem = {
 
 export type Schema = SchemaItem[];
 
-const basedSchema: Schema = [
+const initialState: Schema = [
 	{
 		vendor: "2ch",
 		boards: [
@@ -121,15 +121,15 @@ const basedSchema: Schema = [
 ];
 
 const cache = createCache<Schema>("schema");
-const [cachedSchema] = cache.read(basedSchema);
+const cachedValue = cache.read();
 
-export const $schema = map<Schema>(cachedSchema);
+export const $schema = map<Schema>(cachedValue || initialState);
 export const $schemaChanged = atom(false);
 
 onSet($schema, ({ newValue }) => cache.write(newValue));
 
 const reset = action($schema, "reset", store => {
-	store.set(basedSchema);
+	store.set(initialState);
 });
 
 const toggleBoardEnabled = action(
