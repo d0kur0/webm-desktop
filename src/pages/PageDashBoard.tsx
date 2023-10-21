@@ -205,7 +205,7 @@ export function PageDashBoard() {
 					)}
 				</For>
 
-				<Heading>Сводка</Heading>
+				<Heading mt={12}>Сводка</Heading>
 
 				<List spacing="$3" mt={16}>
 					<ListItem>
