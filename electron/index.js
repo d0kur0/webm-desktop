@@ -11,7 +11,9 @@ if (process.platform === "win32") app.setAppUserModelId(app.getName());
 fs.readdir(path.join(__dirname, "events")).then(files => {
 	try {
 		files.map(file => require(path.join(__dirname, `events/${file}`)));
-	} catch (e) {}
+	} catch (e) {
+		console.error(e)
+	}
 });
 
 const isDev = process.env.NODE_ENV === "development";

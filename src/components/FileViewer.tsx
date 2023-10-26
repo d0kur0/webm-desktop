@@ -1,8 +1,10 @@
 import { Box, Button, ButtonGroup, IconButton, Spinner } from "@hope-ui/solid";
 import { useNavigate } from "@solidjs/router";
 import { IoClose } from "solid-icons/io";
-import { onMount, createMemo, createSignal, onCleanup } from "solid-js";
+import {onMount, createMemo, createSignal, onCleanup, createEffect} from "solid-js";
 import { ExtendedFile, isFileImage } from "../utils/grabbing";
+
+const { ipcRenderer } = window.require("electron");
 
 type FileViewerProps = {
 	file: ExtendedFile;
@@ -45,6 +47,10 @@ export function FileViewer(props: FileViewerProps) {
 	const navigateToThread = () => {
 		navigate(`/thread/${props.file.rootThread.board}/${props.file.rootThread.id}`);
 	};
+
+	createEffect(() => {
+		ipcRenderer.send('discord/changeActivity', JSON.stringify(props.file));
+	});
 
 	return (
 		<Box
