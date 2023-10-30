@@ -76,6 +76,7 @@ export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?
 		<Box css={{ height: "100%", backgroundColor: "#000", position: "relative" }}>
 			{isImage() || (
 				<Box
+					autoplay
 					loop
 					onPlay={() => setPaused(false)}
 					onPause={() => setPaused(true)}
