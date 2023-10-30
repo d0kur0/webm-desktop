@@ -24,4 +24,4 @@ This warning is entirely harmless and only shows because the app is not signed. 
 
 ## Player
 
-![Screenshot 2023-10-21 at 18.54.52.png](screenshots%2FScreenshot%202023-10-21%20at%2018.54.52.png)
+![Screenshot 2023-10-21 at 18.54.52.png](screenshots/Screenshot%202023-10-30%20at%2004.12.11.png)
