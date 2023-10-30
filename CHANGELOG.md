@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/d0kur0/webm-desktop/compare/v1.4.0...v1.4.1) (2023-10-30)
+
+
+### Bug Fixes
+
+* rewind ([7ca66e9](https://github.com/d0kur0/webm-desktop/commit/7ca66e9ec45c96048b5058972ef893b0375028f5))
+
 # [1.4.0](https://github.com/d0kur0/webm-desktop/compare/v1.3.0...v1.4.0) (2023-10-30)
 
 
