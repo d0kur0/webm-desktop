@@ -8,11 +8,11 @@ if (require("electron-squirrel-startup")) {
 
 if (process.platform === "win32") app.setAppUserModelId(app.getName());
 
-fs.readdir(path.join(__dirname, "events")).then(files => {
+fs.readdir(path.join(__dirname, "events")).then((files) => {
 	try {
-		files.map(file => require(path.join(__dirname, `events/${file}`)));
+		files.map((file) => require(path.join(__dirname, `events/${file}`)));
 	} catch (e) {
-		console.error(e)
+		console.error(e);
 	}
 });
 
@@ -22,9 +22,10 @@ const createWindow = () => {
 	app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
 
 	const mainWindow = new BrowserWindow({
+		icon: "../icons/icon.png",
 		frame: false,
-		width: 1240,
-		height: 780,
+		width: 300,
+		height: 400,
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,

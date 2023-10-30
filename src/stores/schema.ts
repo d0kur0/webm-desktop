@@ -128,7 +128,7 @@ export const $schemaChanged = atom(false);
 
 onSet($schema, ({ newValue }) => cache.write(newValue));
 
-const reset = action($schema, "reset", store => {
+const reset = action($schema, "reset", (store) => {
 	store.set(initialState);
 });
 
@@ -137,12 +137,12 @@ const toggleBoardEnabled = action(
 	"toggleBoardEnabled",
 	(store, vendor: Vendors, boardName: string, enabled?: boolean) => {
 		$schema.set(
-			$schema.get().map(schemaItem => {
+			$schema.get().map((schemaItem) => {
 				if (schemaItem.vendor !== vendor) return schemaItem;
 
 				return {
 					...schemaItem,
-					boards: schemaItem.boards.map(board => {
+					boards: schemaItem.boards.map((board) => {
 						if (board.name !== boardName) return board;
 						return { ...board, enabled: enabled !== undefined ? enabled : !board.enabled };
 					}),

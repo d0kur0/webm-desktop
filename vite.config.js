@@ -2,13 +2,7 @@ import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import commonjsExternals from "vite-plugin-commonjs-externals";
 
-const commonjsPackages = [
-	"path",
-	"electron",
-	"electron/main",
-	"electron/common",
-	"electron/renderer",
-];
+const commonjsPackages = ["path", "electron", "electron/main", "electron/common", "electron/renderer"];
 
 export default defineConfig({
 	base: "./",

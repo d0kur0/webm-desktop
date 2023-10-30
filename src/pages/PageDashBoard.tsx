@@ -129,7 +129,7 @@ export function PageDashBoard() {
 
 								<List spacing="$3" css={{ mt: 12 }}>
 									<For each={boards}>
-										{board => (
+										{(board) => (
 											<ListItem>
 												<SwitchPrimitive
 													class={switchRootClass()}
@@ -224,7 +224,7 @@ export function PageDashBoard() {
 
 				<List spacing="$3" mt={12}>
 					<For each={fileTypes()}>
-						{type => (
+						{(type) => (
 							<ListItem>
 								<SwitchPrimitive
 									checked={type.enabled}

@@ -11,11 +11,11 @@ export function PageShuffleFile() {
 	const openedFile = createMemo(() => shuffledFiles()[getOpenedFileIndex()!]);
 
 	const handlePrev = () => {
-		setOpenedFileIndex(v => (v - 1 < 0 ? v : v - 1));
+		setOpenedFileIndex((v) => (v - 1 < 0 ? v : v - 1));
 	};
 
 	const handleNext = () => {
-		setOpenedFileIndex(v => (shuffledFiles().length < v + 1 ? v : v + 1));
+		setOpenedFileIndex((v) => (shuffledFiles().length < v + 1 ? v : v + 1));
 	};
 
 	return <FileViewer file={openedFile()!} onPrev={handlePrev} onNext={handleNext} fromThread={false} />;

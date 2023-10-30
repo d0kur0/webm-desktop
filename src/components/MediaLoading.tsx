@@ -36,7 +36,7 @@ export function MediaLoading() {
 
 			<Box mt={24} css={logsContainerStyles}>
 				<For each={reversedLogs()}>
-					{log => (
+					{(log) => (
 						<Box css={{ display: "flex", gap: 12 }}>
 							<Box css={{ flex: "1 1 0" }}>{log.message}</Box>
 							<Box css={{ color: "$neutral10" }}>[{log.time.toLocaleTimeString()}]</Box>

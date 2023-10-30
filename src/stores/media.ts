@@ -45,7 +45,7 @@ const fetch = action($files, "fetchMedia", async () => {
 	$files.setKey("loading", true);
 
 	const threadsMap = await Promise.all(
-		schema.map(async schemaItem => {
+		schema.map(async (schemaItem) => {
 			$loggerMutations.write(`Получение тредов от ${schemaItem.vendor}`);
 
 			const threads: ThreadsWithVendor = [];
@@ -57,7 +57,7 @@ const fetch = action($files, "fetchMedia", async () => {
 				const threadsResponse = await vendor.fetchThreads(board.name);
 
 				threads.push(
-					...threadsResponse.map(thread => ({
+					...threadsResponse.map((thread) => ({
 						...thread,
 						vendor,
 						countFiles: 0,
@@ -81,7 +81,7 @@ const fetch = action($files, "fetchMedia", async () => {
 			threadsPart.map(async ({ vendor, vendorName, ...thread }) => {
 				$loggerMutations.write(`Получение файлов из треда: ${thread.id}`);
 				const files = await vendor.fetchFiles(thread);
-				return files.map(file => ({
+				return files.map((file) => ({
 					...file,
 					rootThread: { ...file.rootThread, vendorName, countFiles: 0 },
 				}));

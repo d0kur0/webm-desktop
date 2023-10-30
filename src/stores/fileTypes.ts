@@ -43,7 +43,7 @@ onSet($fileTypes, ({ newValue }) => cache.write(newValue));
 
 const toggleTypeEnabled = action($fileTypes, "toggleTypeEnabled", (store, name: AllowedTypes) => {
 	store.set(
-		store.get().map(type => {
+		store.get().map((type) => {
 			if (type.name !== name) return type;
 			return { ...type, enabled: !type.enabled };
 		}),

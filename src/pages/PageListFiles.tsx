@@ -21,7 +21,7 @@ export function PageListFiles() {
 	const [page, setPage] = createSignal(1);
 	const [getOpenedFileIndex, setOpenedFileIndex] = createSignal<number | null>(null);
 
-	const thread = createMemo(() => threads().find(t => t.id === +threadId && t.board === board));
+	const thread = createMemo(() => threads().find((t) => t.id === +threadId && t.board === board));
 
 	const usedFiles = createMemo(() => {
 		if (!threadId) return files();
@@ -34,7 +34,7 @@ export function PageListFiles() {
 
 	const handleRootScroll = debounce((event: Event & { target: HTMLDivElement }) => {
 		const isReadyForLoad = event.target.offsetHeight + event.target.scrollTop >= event.target.scrollHeight;
-		isReadyForLoad && setPage(page => page + 1);
+		isReadyForLoad && setPage((page) => page + 1);
 	}, 250);
 
 	const breakpoints = createMasonryBreakpoints(() => [
@@ -46,11 +46,11 @@ export function PageListFiles() {
 	]);
 
 	const handlePrev = () => {
-		setOpenedFileIndex(v => (v !== null ? (v - 1 < 0 ? v : v - 1) : v));
+		setOpenedFileIndex((v) => (v !== null ? (v - 1 < 0 ? v : v - 1) : v));
 	};
 
 	const handleNext = () => {
-		setOpenedFileIndex(v => (v !== null ? (usedFiles().length < v + 1 ? v : v + 1) : v));
+		setOpenedFileIndex((v) => (v !== null ? (usedFiles().length < v + 1 ? v : v + 1) : v));
 	};
 
 	const handleAddToExcludeThreads = () => {

@@ -32,7 +32,7 @@ export function unpackThreadsFromFiles(files: ExtendedFiles) {
 	};
 
 	return files.reduce<ExtendedThreads>((threads, { rootThread }) => {
-		const threadId = threads.findIndex(thread => compareThreads(thread, rootThread));
+		const threadId = threads.findIndex((thread) => compareThreads(thread, rootThread));
 		const hasThread = !!~threadId;
 
 		hasThread && (threads[threadId].countFiles += 1);
@@ -52,11 +52,11 @@ export function clearThreadsByExclude(
 	{ words, threads: excludedThreads }: ExcludeRulesStore,
 ) {
 	const filterByWords = (thread: ExtendedThread) => {
-		return !words.some(v => thread.subject?.toLowerCase().includes(v.toLowerCase()));
+		return !words.some((v) => thread.subject?.toLowerCase().includes(v.toLowerCase()));
 	};
 
 	const filterByThreadIds = ({ id, board }: ExtendedThread) => {
-		return !excludedThreads.some(simpleThread => simpleThread.id === id && simpleThread.board === board);
+		return !excludedThreads.some((simpleThread) => simpleThread.id === id && simpleThread.board === board);
 	};
 
 	return threads.filter(filterByWords).filter(filterByThreadIds);
@@ -64,9 +64,9 @@ export function clearThreadsByExclude(
 
 export function clearFilesByExclude(files: ExtendedFiles, { words }: ExcludeRulesStore) {
 	return files.filter(
-		file =>
-			![file.name, file.rootThread.subject || ""].some(v =>
-				words.some(w => v?.toLowerCase().includes(w?.toLowerCase())),
+		(file) =>
+			![file.name, file.rootThread.subject || ""].some((v) =>
+				words.some((w) => v?.toLowerCase().includes(w?.toLowerCase())),
 			),
 	);
 }
@@ -75,7 +75,7 @@ export function getVendorInstance(name: keyof typeof VENDORS_MAP) {
 	return VENDORS_MAP[name]({
 		requiredFileTypes: $fileTypes
 			.get()
-			.filter(v => v.enabled)
-			.map(v => v.name),
+			.filter((v) => v.enabled)
+			.map((v) => v.name),
 	});
 }

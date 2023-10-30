@@ -4,6 +4,8 @@ import { render } from "solid-js/web";
 import { App } from "./App";
 import { hashIntegration, Router } from "@solidjs/router";
 
+document.querySelector(".loading")?.remove();
+
 const root = document.getElementById("root");
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
