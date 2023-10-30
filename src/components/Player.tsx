@@ -148,13 +148,15 @@ export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?
 
 				<Box css={{ flex: "1 1 0", display: "flex", alignItems: "center" }}>
 					<Box
+						min={0}
+						max={getDuration()}
 						as="input"
 						css={{ flex: "1 1 0" }}
 						step={0.1}
 						type="range"
 						value={getCurrentTime()}
 						disabled={isImage()}
-						onChange={handleRewind}
+						onInput={handleRewind}
 					/>
 				</Box>
 
