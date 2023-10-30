@@ -2,7 +2,7 @@ import { Route, Routes } from "@solidjs/router";
 import { NotificationsProvider, HopeProvider, Box } from "@hope-ui/solid";
 import { useStore } from "@nanostores/solid";
 import { $files } from "./stores/media";
-import { ErrorBoundary, Match, Switch } from "solid-js";
+import { ErrorBoundary, Match, onMount, Switch } from "solid-js";
 import { MediaLoading } from "./components/MediaLoading";
 import { PageDashBoard } from "./pages/PageDashBoard";
 import { WindowBar } from "./components/WindowBar";
@@ -11,6 +11,8 @@ import { PageListFiles } from "./pages/PageListFiles";
 import { PageShuffleFile } from "./pages/PageShuffleFile";
 import "./App.css";
 import { ViewPort } from "./components/ViewPort";
+
+const { ipcRenderer } = window.require("electron");
 
 function Routing() {
 	return (
@@ -27,12 +29,16 @@ function Routing() {
 export function App() {
 	const media = useStore($files);
 
+	onMount(() => {
+		ipcRenderer.send("window/setupSizes");
+	});
+
 	return (
 		<HopeProvider config={{ initialColorMode: "system" }}>
 			<NotificationsProvider placement="bottom">
 				<WindowBar />
 
-				<ErrorBoundary fallback={err => <Box css={{ p: 16 }}>{err.toString()}</Box>}>
+				<ErrorBoundary fallback={(err) => <Box css={{ p: 16 }}>{err.toString()}</Box>}>
 					<Switch>
 						<Match when={media().loading}>
 							<MediaLoading />
