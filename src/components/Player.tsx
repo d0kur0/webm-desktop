@@ -52,6 +52,17 @@ export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?
 		await navigator.clipboard.writeText(props.file.url);
 	};
 
+	const handleDownload = async () => {
+		const response = await fetch(props.file.url);
+		const blob = await response.blob();
+
+		const link = document.createElement("a");
+		link.href = URL.createObjectURL(blob);
+		link.download = props.file.url.split("/").pop() || props.file.name;
+		link.click();
+		link.remove();
+	};
+
 	createEffect(() => {
 		videoRef && (videoRef.volume = getVolume());
 	});
@@ -167,7 +178,7 @@ export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?
 				</Box>
 
 				<ButtonGroup size="sm" variant="outline" colorScheme="warning">
-					<Button>
+					<Button onClick={handleDownload}>
 						<AiOutlineCloudDownload />
 					</Button>
 					<Button onClick={handleCopy}>
