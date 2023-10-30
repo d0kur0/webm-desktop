@@ -13,3 +13,8 @@ ipcMain.on("window/toggleFullscreen", () => {
 ipcMain.on("window/close", () => {
 	getMainWindow().close();
 });
+
+ipcMain.on("window/setupSizes", () => {
+	getMainWindow().setSize(1240, 780);
+	getMainWindow().center();
+});
