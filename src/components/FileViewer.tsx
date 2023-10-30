@@ -1,8 +1,9 @@
-import { Box, Button, ButtonGroup, IconButton, Spinner } from "@hope-ui/solid";
+import { Badge, Box, Button, ButtonGroup, IconButton } from "@hope-ui/solid";
 import { useNavigate } from "@solidjs/router";
 import { IoClose } from "solid-icons/io";
-import {onMount, createMemo, createSignal, onCleanup, createEffect} from "solid-js";
+import { onMount, createMemo, onCleanup, createEffect } from "solid-js";
 import { ExtendedFile, isFileImage } from "../utils/grabbing";
+import { Player } from "./Player";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -16,29 +17,14 @@ type FileViewerProps = {
 	onPrev?: () => void;
 };
 
-const centerPositionStyles = {
-	top: "50%",
-	left: "50%",
-	zIndex: 1233,
-	position: "absolute",
-	transform: "translate(-50%, -50%)",
-};
-
 export function FileViewer(props: FileViewerProps) {
 	const isImage = createMemo(() => isFileImage(props.file));
 	const navigate = useNavigate();
-
-	const [isLoading, setIsLoading] = createSignal(true);
-	const [isLoadingFailed, setIsLoadingFailed] = createSignal(false);
 
 	const listener = (event: KeyboardEvent) => {
 		event.key === "Escape" && props.onClose?.();
 		event.key === "ArrowLeft" && props.onPrev?.();
 		event.key === "ArrowRight" && props.onNext?.();
-	};
-
-	const handleCopy = async () => {
-		await navigator.clipboard.writeText(props.file.url);
 	};
 
 	onMount(() => window.addEventListener("keydown", listener));
@@ -49,7 +35,7 @@ export function FileViewer(props: FileViewerProps) {
 	};
 
 	createEffect(() => {
-		ipcRenderer.send('discord/changeActivity', JSON.stringify(props.file));
+		ipcRenderer.send("discord/changeActivity", JSON.parse(JSON.stringify(props.file)));
 	});
 
 	return (
@@ -73,8 +59,28 @@ export function FileViewer(props: FileViewerProps) {
 					justifyContent: "space-between",
 				}}
 			>
-				<Box css={{ color: "$neutral9", display: "flex", flex: "1 1 0" }}>
-					<Box css={{ flex: "1 1 0" }}>{props.file.name || "Файл без имени"}</Box>
+				<Box css={{ color: "$neutral10", display: "flex", flex: "1 1 0", alignItems: "center" }}>
+					<Box css={{ flex: "1 1 0", fontSize: "0.8em" }}>
+						<Box>
+							<Box css={{ display: "flex", gap: 6, alignItems: "center" }}>
+								<Badge
+									css={{ fontSize: "0.7em" }}
+									colorScheme={props.file.rootThread.vendorName === "4chan" ? "success" : "warning"}
+								>
+									{props.file.rootThread.vendorName}/{props.file.rootThread.board}/
+								</Badge>
+
+								<Badge css={{ fontSize: "0.7em" }} colorScheme={isImage() ? "accent" : "info"}>
+									{isImage() ? "image" : "video"}
+								</Badge>
+
+								{props.file.name.substring(0, 120) || "Файл без имени"}
+							</Box>
+							<Box>
+								<b>thread:</b> {props.file.rootThread.subject?.substring(0, 120)}
+							</Box>
+						</Box>
+					</Box>
 
 					<ButtonGroup size="xs" colorScheme="info" variant="dashed" ml={16}>
 						{props.fromThread || <Button onClick={navigateToThread}>Открыть тред</Button>}
@@ -95,68 +101,14 @@ export function FileViewer(props: FileViewerProps) {
 				</Box>
 			</Box>
 
-			<Box css={{ height: "calc(100vh - 156px)", display: "flex", flexDirection: "column" }}>
-				<Box
-					css={{
-						height: "100%",
-						display: "flex",
-						position: "relative",
-						alignItems: "center",
-						justifyContent: "center",
-					}}
-				>
-					{isLoading() && (
-						<Box css={centerPositionStyles}>
-							<Spinner />
-						</Box>
-					)}
-
-					{isLoadingFailed() && <Box css={centerPositionStyles}>Loading failed</Box>}
-
-					<Box
-						css={{
-							width: "100%",
-							height: "100%",
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "center",
-						}}
-					>
-						{isImage() && (
-							<Box
-								as="img"
-								css={{ height: "100%" }}
-								src={props.file.url}
-								alt={props.file.name}
-								onLoad={() => setIsLoading(false)}
-								onError={() => setIsLoadingFailed(true)}
-							/>
-						)}
-
-						{isImage() || (
-							<Box
-								as="video"
-								css={{ height: "100%", width: "100%" }}
-								src={props.file.url}
-								loop
-								autoplay
-								controls
-								preload="metadata"
-								onError={() => setIsLoadingFailed(true)}
-								onLoadedData={() => setIsLoading(false)}
-							/>
-						)}
-					</Box>
-				</Box>
-			</Box>
-
-			<Box css={{ p: 16, display: "flex", alignItems: "center", gap: 12 }}>
-				<ButtonGroup colorScheme="accent" size="xs">
-					<Button onClick={props.onPrev}>prev</Button>
-					<Button onClick={props.onNext}>next</Button>
-
-					<Button onClick={() => handleCopy()}>copy</Button>
-				</ButtonGroup>
+			<Box
+				css={{
+					height: "calc(100vh - (var(--window-header-height) + 52px))",
+					display: "flex",
+					flexDirection: "column",
+				}}
+			>
+				<Player onNext={props.onNext} onPrev={props.onPrev} file={props.file} />
 			</Box>
 		</Box>
 	);
