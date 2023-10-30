@@ -5,9 +5,5 @@
 	"semi": true,
 	"singleQuote": false,
 	"bracketSpacing": true,
-	"bracketSameLine": false,
-	"arrowParens": "avoid",
-	"importOrder": [],
-	"importOrderSeparation": true,
-	"importOrderSortSpecifiers": true
+	"bracketSameLine": false
 }
