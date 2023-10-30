@@ -9,7 +9,7 @@ import {
 	Tooltip,
 	notificationService,
 } from "@hope-ui/solid";
-import { createMemo, createSignal, For } from "solid-js";
+import { createEffect, createMemo, createSignal, For } from "solid-js";
 import { useStore } from "@nanostores/solid";
 import { $threads } from "../stores/media";
 import { Empty } from "../components/Empty";
@@ -18,6 +18,7 @@ import { useNavigate } from "@solidjs/router";
 import { ImEyeBlocked } from "solid-icons/im";
 import { ImBlocked } from "solid-icons/im";
 import { $excludeRulesMutations } from "../stores/excludeRules";
+import { createVisibilityObserver } from "@solid-primitives/intersection-observer";
 
 type ThreadCard = {
 	thread: ExtendedThread;
@@ -103,14 +104,27 @@ function ThreadCard(props: ThreadCard) {
 	);
 }
 
+const LIMIT = 20;
+
 export function PageThreads() {
 	const [searchQuery, setSearchQuery] = createSignal("");
+	const [getPage, setPage] = createSignal(1);
 
 	const threads = useStore($threads);
 
 	const threadsForRender = createMemo(() =>
-		threads().filter(thread => thread.subject?.toLowerCase().includes(searchQuery().toLowerCase())),
+		threads()
+			.filter((thread) => thread.subject?.toLowerCase().includes(searchQuery().toLowerCase()))
+			.slice(0, getPage() * LIMIT),
 	);
+
+	let loadMoreRef: HTMLDivElement;
+
+	const visible = createVisibilityObserver({ threshold: 0.8 })(() => loadMoreRef);
+
+	createEffect(() => {
+		visible() && setPage((v) => v + 1);
+	});
 
 	return (
 		<Box p={16}>
@@ -138,8 +152,10 @@ export function PageThreads() {
 
 				<Box css={{ display: "flex", flexDirection: "column", gap: 12 }}>
 					<For each={threadsForRender()} fallback={<Empty>Список тредов пуст</Empty>}>
-						{thread => <ThreadCard thread={thread} />}
+						{(thread) => <ThreadCard thread={thread} />}
 					</For>
+
+					<div ref={loadMoreRef!} />
 				</Box>
 			</Box>
 		</Box>
