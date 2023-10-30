@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/d0kur0/webm-desktop/compare/v1.3.0...v1.4.0) (2023-10-30)
+
+
+### Features
+
+* add autoplay ([bdfda6a](https://github.com/d0kur0/webm-desktop/commit/bdfda6ac44597e0572755e81c0541649b844be37))
+
 # [1.3.0](https://github.com/d0kur0/webm-desktop/compare/v1.2.0...v1.3.0) (2023-10-30)
 
 
