@@ -11,6 +11,7 @@ import { RiSystemDashboardLine } from "solid-icons/ri";
 import { TbArrowsRandom } from "solid-icons/tb";
 import { TbListDetails } from "solid-icons/tb";
 import { BsSignIntersectionT } from "solid-icons/bs";
+import { AiOutlineReload } from "solid-icons/ai";
 
 const { ipcRenderer } = window.require("electron");
 
@@ -93,7 +94,7 @@ export function WindowBar() {
 
 	const handleToggleFullScreen = () => {
 		ipcRenderer.send("window/toggleFullscreen");
-		setIsFullscreen(v => !v);
+		setIsFullscreen((v) => !v);
 	};
 
 	const handleCloseWindow = () => {
@@ -101,7 +102,7 @@ export function WindowBar() {
 	};
 
 	const openDevTools = () => {
-		setIsDevToolsOpened(v => !v);
+		setIsDevToolsOpened((v) => !v);
 		ipcRenderer.send("debug/openTools");
 	};
 
@@ -126,6 +127,16 @@ export function WindowBar() {
 				<Box css={{ "-webkit-app-region": "drag", flex: "1 1 0", height: "100%" }} />
 
 				<Box css={{ display: "flex", alignItems: "center" }}>
+					<IconButton
+						css={iconButtonStyles}
+						icon={<AiOutlineReload />}
+						size="sm"
+						variant="dashed"
+						onClick={() => location.reload()}
+						aria-label="reload"
+						colorScheme="success"
+					/>
+
 					<IconButton
 						css={iconButtonStyles}
 						icon={<RiDevelopmentBugFill />}
