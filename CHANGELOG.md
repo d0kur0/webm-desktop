@@ -1,3 +1,27 @@
+# [1.3.0](https://github.com/d0kur0/webm-desktop/compare/v1.2.0...v1.3.0) (2023-10-30)
+
+
+### Bug Fixes
+
+* handle error for setter of discord activity ([8ac7bc4](https://github.com/d0kur0/webm-desktop/commit/8ac7bc4012cc931fc23c58699db504f520f3736d))
+* reformat with prettier ([0d01187](https://github.com/d0kur0/webm-desktop/commit/0d0118706fba44dc64865c3aa6c60af42bf17030))
+* setup window size and recenter after loading screen ([e91575e](https://github.com/d0kur0/webm-desktop/commit/e91575e89a9c6deb3256a856e96f58d31b38a0d4))
+
+
+### Features
+
+* add app icon ([92a842a](https://github.com/d0kur0/webm-desktop/commit/92a842a671f361d354147c3c258802704b77ed4f))
+* add discord activity ([#2](https://github.com/d0kur0/webm-desktop/issues/2)) ([2026e47](https://github.com/d0kur0/webm-desktop/commit/2026e47524159f40316cdb3dc05f54eb8b392ff7))
+* add loading screen for app ([b227143](https://github.com/d0kur0/webm-desktop/commit/b2271431f3db8fbb61568c85e1322bc5927fe53c))
+* add reload button ([16d7024](https://github.com/d0kur0/webm-desktop/commit/16d70243aa185e8156d73ea20648d86ea3e60ed9))
+* add styles for range input ([3b4418d](https://github.com/d0kur0/webm-desktop/commit/3b4418d02cbc98550479514e6c837a94ba8b199a))
+* make custom video/image player ([05dad29](https://github.com/d0kur0/webm-desktop/commit/05dad293d1e844023fa559308e37606159492b3e))
+
+
+### Performance Improvements
+
+* add batch rendering for threads on scroll ([d5a0d49](https://github.com/d0kur0/webm-desktop/commit/d5a0d493dc98056e3856bea5125dcd3a97485e39))
+
 # [1.2.0](https://github.com/d0kur0/webm-desktop/compare/v1.1.0...v1.2.0) (2023-10-21)
 
 ### Features
