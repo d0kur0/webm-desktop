@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/d0kur0/webm-desktop/compare/v1.4.1...v1.4.2) (2024-01-25)
+
+
+### Bug Fixes
+
+* discord activity ([2c38d1f](https://github.com/d0kur0/webm-desktop/commit/2c38d1f60b905f2b2e335618a4dd882acd36ecf1))
+
 ## [1.4.1](https://github.com/d0kur0/webm-desktop/compare/v1.4.0...v1.4.1) (2023-10-30)
 
 
