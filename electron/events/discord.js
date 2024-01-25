@@ -1,11 +1,15 @@
 const { ipcMain } = require("electron");
 const { register, Client } = require("discord-rpc");
 
-const clientId = "1166773524380274788";
-register(clientId);
+try {
+	const clientId = "1166773524380274788";
+	register(clientId);
 
-const rpc = new Client({ transport: "ipc" });
-rpc.login({ clientId }).catch(console.error);
+	const rpc = new Client({ transport: "ipc" });
+	rpc.login({ clientId }).catch(() => {});
+} catch (e) {
+	// Поебать
+}
 
 ipcMain.on("discord/changeActivity", (event, file) => {
 	queueMicrotask(async () => {
