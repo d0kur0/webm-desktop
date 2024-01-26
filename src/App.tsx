@@ -1,4 +1,4 @@
-import { Link, Route, Routes } from "@solidjs/router";
+import { Route, Routes } from "@solidjs/router";
 import { NotificationsProvider, HopeProvider, Box, Heading, Anchor, Button } from "@hope-ui/solid";
 import { useStore } from "@nanostores/solid";
 import { $files } from "./stores/media";
