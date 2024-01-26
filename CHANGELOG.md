@@ -1,3 +1,16 @@
+# [1.5.0](https://github.com/d0kur0/webm-desktop/compare/v1.4.2...v1.5.0) (2024-01-26)
+
+
+### Bug Fixes
+
+* linter issue ([4c66864](https://github.com/d0kur0/webm-desktop/commit/4c668647cfc66c8d10b093b642bab6d88e5c9579))
+* remove discord-rpc and update electron ([693580b](https://github.com/d0kur0/webm-desktop/commit/693580bd378ff4ba42f7b1212e71447e8f6d9257))
+
+
+### Features
+
+* make player more friendly, add loop button, and auto next then disabled \ loading error, optimize render files list (use previewImage instead of fullsize) ([388c72a](https://github.com/d0kur0/webm-desktop/commit/388c72a066438a39780f6dcdf8c6c091c0e89df7))
+
 ## [1.4.2](https://github.com/d0kur0/webm-desktop/compare/v1.4.1...v1.4.2) (2024-01-25)
 
 
