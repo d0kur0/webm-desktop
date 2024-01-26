@@ -1,11 +1,12 @@
-import { Box, Button, ButtonGroup, Spinner } from "@hope-ui/solid";
+import { Box, Button, ButtonGroup, Spinner, Tooltip } from "@hope-ui/solid";
 import { AiOutlineCloudDownload } from "solid-icons/ai";
 import { FaRegularCopy } from "solid-icons/fa";
 import { FaSolidVolumeHigh } from "solid-icons/fa";
 import { TbPlayerTrackNextFilled, TbPlayerTrackPrevFilled } from "solid-icons/tb";
-import { createEffect, createMemo, createSignal, JSX } from "solid-js";
+import { createEffect, createMemo, createSignal, JSX, onMount } from "solid-js";
 import { ExtendedFile, isFileImage } from "../utils/grabbing";
 import { VsDebugPause, VsPlay } from "solid-icons/vs";
+import { RiSystemLoopLeftFill } from "solid-icons/ri";
 
 function formatSeconds(seconds: number) {
 	if (isNaN(seconds)) return "...";
@@ -16,6 +17,7 @@ function formatSeconds(seconds: number) {
 
 export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?: () => void }) {
 	const [getError, setError] = createSignal(false);
+	const [getIsLoop, setIsLoop] = createSignal(!!localStorage.loop || false);
 	const [getPaused, setPaused] = createSignal(true);
 	const [getVolume, setVolume] = createSignal(localStorage.volume !== undefined ? +localStorage.volume : 0.5);
 	const [getLoading, setLoading] = createSignal(true);
@@ -25,6 +27,10 @@ export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?
 	const isImage = createMemo(() => isFileImage(props.file));
 
 	let videoRef: HTMLVideoElement;
+
+	onMount(() => {
+		videoRef && (videoRef.volume = getVolume());
+	});
 
 	const togglePaused = () => {
 		videoRef.paused ? videoRef.play() : videoRef.pause();
@@ -63,12 +69,46 @@ export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?
 		link.remove();
 	};
 
+	const toggleIsLoop = () => {
+		getIsLoop() ? localStorage.removeItem("loop") : localStorage.setItem("loop", "true");
+		setIsLoop((v) => !v);
+	};
+
+	const onPlay = () => {
+		setError(false);
+		setPaused(false);
+	};
+
+	const onLoadStart = () => {
+		setError(false);
+		setLoading(true);
+	};
+
+	const onCanPlay = () => {
+		setError(false);
+		setLoading(false);
+	};
+
+	const onPause = () => {
+		setPaused(true);
+	};
+
+	const onError = () => {
+		setError(true);
+		props.onNext?.();
+	};
+
+	const onEnded = () => {
+		getIsLoop() || props.onNext?.();
+	};
+
 	createEffect(() => {
 		videoRef && (videoRef.volume = getVolume());
 	});
 
 	createEffect(() => {
 		console.log(props.file);
+		setError(false);
 		setLoading(true);
 	});
 
@@ -76,16 +116,17 @@ export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?
 		<Box css={{ height: "100%", backgroundColor: "#000", position: "relative" }}>
 			{isImage() || (
 				<Box
+					as="video"
 					autoplay
-					loop
-					onPlay={() => setPaused(false)}
-					onPause={() => setPaused(true)}
-					onError={() => setError(true)}
-					onCanPlay={() => setLoading(false)}
-					onLoadStart={() => setLoading(true)}
+					loop={getIsLoop()}
+					onPlay={onPlay}
+					onPause={onPause}
+					onError={onError}
+					onEnded={onEnded}
+					onCanPlay={onCanPlay}
+					onLoadStart={onLoadStart}
 					onTimeUpdate={handleChangeCurrentTime}
 					onDurationChange={handleChangeDuration}
-					as="video"
 					ref={videoRef!}
 					css={{ height: "100%", width: "100%", maxHeight: "100%" }}
 					src={props.file.url}
@@ -142,6 +183,15 @@ export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?
 					<Button onClick={props.onNext}>
 						<TbPlayerTrackNextFilled />
 					</Button>
+					<Tooltip withArrow label={`Повтор видео: ${getIsLoop() ? "вкл" : "выкл"}`}>
+						<Button
+							disabled={isImage()}
+							colorScheme={getIsLoop() ? "danger" : "accent"}
+							onClick={toggleIsLoop}
+						>
+							<RiSystemLoopLeftFill />
+						</Button>
+					</Tooltip>
 				</ButtonGroup>
 
 				<Box css={{ fontWeight: "bolder" }}>{formatSeconds(getCurrentTime())}</Box>
@@ -181,12 +231,16 @@ export function Player(props: { file: ExtendedFile; onNext?: () => void; onPrev?
 				</Box>
 
 				<ButtonGroup size="sm" variant="outline" colorScheme="warning">
-					<Button onClick={handleDownload}>
-						<AiOutlineCloudDownload />
-					</Button>
-					<Button onClick={handleCopy}>
-						<FaRegularCopy />
-					</Button>
+					<Tooltip withArrow label={`Скачать файл`}>
+						<Button onClick={handleDownload}>
+							<AiOutlineCloudDownload />
+						</Button>
+					</Tooltip>
+					<Tooltip withArrow label={`Копировать ссылку`}>
+						<Button onClick={handleCopy}>
+							<FaRegularCopy />
+						</Button>
+					</Tooltip>
 				</ButtonGroup>
 			</Box>
 		</Box>

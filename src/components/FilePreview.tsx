@@ -116,25 +116,13 @@ export function FilePreview(props: FilePreviewProps) {
 							</Box>
 						</Box>
 
-						{isImage() && (
-							<img
-								src={props.file.url}
-								alt="preview image"
-								style={mediaElementStyles}
-								onLoad={() => setIsLoading(false)}
-								onError={() => setIsLoadingFailed(true)}
-							/>
-						)}
-
-						{isImage() || (
-							<video
-								src={`${props.file.url}#t=0.1`}
-								style={mediaElementStyles}
-								preload="metadata"
-								onError={() => setIsLoadingFailed(true)}
-								onLoadedData={() => setIsLoading(false)}
-							/>
-						)}
+						<img
+							src={props.file.previewUrl}
+							alt="preview image"
+							style={mediaElementStyles}
+							onLoad={() => setIsLoading(false)}
+							onError={() => setIsLoadingFailed(true)}
+						/>
 
 						{isLoading() && (
 							<Box css={centerPositionStyles}>
