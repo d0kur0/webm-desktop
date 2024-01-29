@@ -1,4 +1,13 @@
-import { Box, Heading, Anchor, Tooltip, Button, ButtonGroup, notificationService } from "@hope-ui/solid";
+import {
+	Box,
+	Heading,
+	Anchor,
+	Tooltip,
+	Button,
+	ButtonGroup,
+	notificationService,
+	Switch,
+} from "@hope-ui/solid";
 import { createMemo, createSignal } from "solid-js";
 import { useStore } from "@nanostores/solid";
 import { $filteredFiles, $threads } from "../stores/media";
@@ -9,11 +18,13 @@ import { createMasonryBreakpoints, Mason } from "solid-mason";
 import { FilePreview } from "../components/FilePreview";
 import { ImBlocked, ImEyeBlocked } from "solid-icons/im";
 import { $excludeRulesMutations } from "../stores/excludeRules";
+import { $hoverPreview, $hoverPreviewActions } from "../stores/settings";
 
 const PAGE_LIMIT = 70;
 
 export function PageListFiles() {
 	const { board, threadId } = useParams();
+	const hoverPreview = useStore($hoverPreview);
 
 	const files = useStore($filteredFiles);
 	const threads = useStore($threads);
@@ -100,8 +111,27 @@ export function PageListFiles() {
 				/>
 			)}
 
-			<Heading css={{ mb: 12, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
-				{threadId ? thread()?.subject : "Список файлов"}
+			<Heading
+				css={{
+					mb: 12,
+					display: "flex",
+					overflow: "hidden",
+					alignItems: "top",
+					whiteSpace: "nowrap",
+					textOverflow: "ellipsis",
+				}}
+			>
+				<Box css={{ flex: "1 1 0" }}>{threadId ? thread()?.subject : "Список файлов"}</Box>
+				<Box css={{ mb: 12, display: "flex", alignItems: "center", gap: 6 }}>
+					<Switch
+						size="sm"
+						checked={hoverPreview()}
+						onChange={$hoverPreviewActions.toggle}
+						colorScheme="accent"
+					>
+						Live preview
+					</Switch>
+				</Box>
 			</Heading>
 
 			{threadId && (

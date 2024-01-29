@@ -1,7 +1,9 @@
 import { Box, Spinner } from "@hope-ui/solid";
-import { createEffect, createMemo, createSignal } from "solid-js";
+import { Match, Switch, createEffect, createMemo, createSignal } from "solid-js";
 import { ExtendedFile, isFileImage } from "../utils/grabbing";
 import { JSX } from "solid-js";
+import { useStore } from "@nanostores/solid";
+import { $hoverPreview } from "../stores/settings";
 
 type FilePreviewProps = {
 	file: ExtendedFile;
@@ -35,6 +37,8 @@ const badgeStyles = {
 };
 
 export function FilePreview(props: FilePreviewProps) {
+	const hoverPreview = useStore($hoverPreview);
+
 	const [isInViewport, setIsInViewport] = createSignal(true);
 
 	const isImage = createMemo(() => isFileImage(props.file));
@@ -44,6 +48,7 @@ export function FilePreview(props: FilePreviewProps) {
 
 	const [isLoading, setIsLoading] = createSignal(true);
 	const [isLoadingFailed, setIsLoadingFailed] = createSignal(false);
+	const [isHovered, setIsHovered] = createSignal(false);
 
 	let rootRef: HTMLDivElement;
 
@@ -64,8 +69,20 @@ export function FilePreview(props: FilePreviewProps) {
 		return () => observer.disconnect();
 	});
 
+	const onMouseEnter = () => {
+		if (!hoverPreview()) return;
+		setIsHovered(true);
+	};
+
+	const onMouseLeave = () => {
+		if (!hoverPreview()) return;
+		setIsHovered(false);
+	};
+
 	return (
 		<Box
+			onMouseEnter={onMouseEnter}
+			onMouseLeave={onMouseLeave}
 			ref={rootRef!}
 			css={{ "aspect-ratio": `${width()}/${height()}`, padding: "10px" }}
 			onClick={props.onOpen}
@@ -116,13 +133,40 @@ export function FilePreview(props: FilePreviewProps) {
 							</Box>
 						</Box>
 
-						<img
-							src={props.file.previewUrl}
-							alt="preview image"
-							style={mediaElementStyles}
-							onLoad={() => setIsLoading(false)}
-							onError={() => setIsLoadingFailed(true)}
-						/>
+						<Switch>
+							<Match when={isHovered()}>
+								<Switch>
+									<Match when={isImage()}>
+										<img
+											src={props.file.url}
+											alt="preview image"
+											style={mediaElementStyles}
+											onLoad={() => setIsLoading(false)}
+											onError={() => setIsLoadingFailed(true)}
+										/>
+									</Match>
+									<Match when={!isImage()}>
+										<video
+											ref={(v) => (v.volume = 0)}
+											src={props.file.url}
+											autoplay
+											style={mediaElementStyles}
+											onLoad={() => setIsLoading(false)}
+											onError={() => setIsLoadingFailed(true)}
+										/>
+									</Match>
+								</Switch>
+							</Match>
+							<Match when={!isHovered()}>
+								<img
+									src={props.file.previewUrl}
+									alt="preview image"
+									style={mediaElementStyles}
+									onLoad={() => setIsLoading(false)}
+									onError={() => setIsLoadingFailed(true)}
+								/>
+							</Match>
+						</Switch>
 
 						{isLoading() && (
 							<Box css={centerPositionStyles}>
