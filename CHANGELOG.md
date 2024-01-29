@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/d0kur0/webm-desktop/compare/v1.5.0...v1.6.0) (2024-01-29)
+
+
+### Features
+
+* add live preview ([9237940](https://github.com/d0kur0/webm-desktop/commit/92379409ac57973fef2aa43dd6e1895565815ede))
+
 # [1.5.0](https://github.com/d0kur0/webm-desktop/compare/v1.4.2...v1.5.0) (2024-01-26)
 
 
